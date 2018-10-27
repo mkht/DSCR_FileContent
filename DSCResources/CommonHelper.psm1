@@ -1,3 +1,14 @@
+Enum Encoding {
+    Default
+    utf8
+    utf8NoBOM
+    utf8BOM
+    utf32
+    unicode
+    bigendianunicode
+    ascii
+}
+
 
 function Convert-NewLine {
     [OutputType([string])]

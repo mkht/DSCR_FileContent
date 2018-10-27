@@ -4,18 +4,6 @@ $script:commonHelperFilePath = Join-Path -Path $script:dscResourcesFolderFilePat
 Import-Module -Name $script:commonHelperFilePath
 
 
-Enum Encoding {
-    Default
-    utf8
-    utf8NoBOM
-    utf8BOM
-    utf32
-    unicode
-    bigendianunicode
-    ascii
-}
-
-
 #region Get-TargetResource
 function Get-TargetResource {
     [CmdletBinding()]
@@ -45,7 +33,8 @@ function Get-TargetResource {
         $Mode = 'Value',
 
         [Parameter(Mandatory = $false)]
-        [Encoding]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [string]
         $Encoding = 'utf8NoBOM',
 
         [Parameter(Mandatory = $false)]
@@ -188,7 +177,8 @@ function Test-TargetResource {
         $Mode = 'Value',
 
         [Parameter(Mandatory = $false)]
-        [Encoding]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [string]
         $Encoding = 'utf8NoBOM',
 
         [Parameter(Mandatory = $false)]
@@ -234,7 +224,8 @@ function Set-TargetResource {
         $Mode = 'Value',
 
         [Parameter(Mandatory = $false)]
-        [Encoding]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [string]
         $Encoding = 'utf8NoBOM',
 
         [Parameter(Mandatory = $false)]
