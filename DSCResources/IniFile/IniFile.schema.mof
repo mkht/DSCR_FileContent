@@ -1,0 +1,13 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("IniFile")]
+class IniFile : OMI_BaseResource
+{
+    [Write, ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Key] String Key;
+    [Write] String Value;
+    [Key] String Path;
+    [key] String Section;
+    [Write, ValueMap{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "Default"}, Values{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "Default"}] String Encoding;
+    [Write, ValueMap{"CRLF", "LF"}, Values{"CRLF", "LF"}] String NewLine;
+};
+

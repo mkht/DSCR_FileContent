@@ -1,0 +1,12 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("JsonFile")]
+class JsonFile : OMI_BaseResource
+{
+    [Write, ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Key] String Path;
+    [Key] String Key;
+    [Key] String Value;
+    [Write, ValueMap{"Value", "ArrayElement"}, Values{"Value", "ArrayElement"}] String Mode;
+    [Write, ValueMap{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "Default"}, Values{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "Default"}] String Encoding;
+    [Write, ValueMap{"CRLF", "LF"}, Values{"CRLF", "LF"}] String NewLine;
+};

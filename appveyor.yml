@@ -1,0 +1,48 @@
+#---------------------------------#
+#      environment configuration  #
+#---------------------------------#
+
+version: 1.0.{build}
+
+# Needed if project name contains underscore
+clone_folder: C:\projects\DSCR_FileContent
+
+init:
+  # Needed for publishing of examples, build worker defaults to core.autocrlf=input.
+  - git config --global core.autocrlf true
+
+install:
+    - git clone https://github.com/PowerShell/DscResource.Tests
+    - ps: |
+        $moduleName = 'DSCR_FileContent'
+        Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
+        Invoke-AppveyorInstallTask
+        Write-Verbose -Message "PowerShell version $($PSVersionTable.PSVersion)" -Verbose
+        $pester =  Get-Module -ListAvailable -Name Pester | sort Version -Descending | select -First 1
+        Write-Verbose -Message "Pester version $($pester.Version.ToString())" -Verbose
+
+#---------------------------------#
+#      build configuration        #
+#---------------------------------#
+
+build: false
+
+#---------------------------------#
+#      test configuration         #
+#---------------------------------#
+
+test_script:
+    - ps: |
+        Invoke-AppveyorTestScriptTask `
+            -Type 'Default' `
+            -CodeCoverage `
+            -CodeCovIo `
+            -DisableConsistency `
+            -ExcludeTag @('Markdown')
+
+
+# scripts to run before deployment
+after_test:
+    - ps: |
+        Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
+        Invoke-AppveyorAfterTestTask -ResourceModuleName $moduleName
