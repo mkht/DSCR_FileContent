@@ -8,13 +8,13 @@ version: 1.0.{build}
 clone_folder: C:\projects\DSCR_FileContent
 
 init:
-  - git config --global core.autocrlf true
+  - git config --global core.autocrlf input
 
 install:
     - ps: |
         $moduleName = 'DSCR_FileContent'
         Install-PackageProvider -Name NuGet -Force -ErrorAction Stop
-        Write-Host 'Installing NuGet PackageProvide'
+        Write-Host 'Installing NuGet PackageProvider'
         Install-Module Pester -Force -SkipPublisherCheck
         $pester =  Get-Module -ListAvailable -Name Pester | sort Version -Descending | select -First 1
         Write-Host -Message "PowerShell version $($PSVersionTable.PSVersion)"
@@ -35,11 +35,14 @@ test_script:
         Write-Host -Message "Test Start"
         $testResultsFile = "$env:APPVEYOR_BUILD_FOLDER/TestsResults.xml"
         $result = Invoke-Pester -CodeCoverage $env:APPVEYOR_BUILD_FOLDER\DSCResources\*\*.psm1 -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
+        Write-Host -Message "Test Finished"
+        Write-Host -Message "Uploading test result"
+        $wc = New-Object 'System.Net.WebClient'
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", "$env:APPVEYOR_BUILD_FOLDER/TestsResults.xml")
         if ($result.FailedCount -gt 0) {
-         throw "$($result.FailedCount) tests failed."
+            throw "$($result.FailedCount) tests failed."
         }
         if ($result.PassedCount -eq 0) {
             throw "No tests passed."
         }
-        $wc = New-Object 'System.Net.WebClient'
-        $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", "$env:APPVEYOR_BUILD_FOLDER/TestsResults.xml")
+        Write-Host -Message "Test script end"
