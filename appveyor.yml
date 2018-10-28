@@ -11,6 +11,7 @@ init:
   - git config --global core.autocrlf input
 
 install:
+    - choco install codecov
     - ps: |
         $moduleName = 'DSCR_FileContent'
         Install-PackageProvider -Name NuGet -Force -ErrorAction Stop
@@ -39,6 +40,8 @@ test_script:
         Write-Host -Message "Uploading test result"
         $wc = New-Object 'System.Net.WebClient'
         $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", "$env:APPVEYOR_BUILD_FOLDER/TestsResults.xml")
+        Export-CodeCovIoJson -CodeCoverage $result.CodeCoverage -RepoRoot $env:APPVEYOR_BUILD_FOLDER -Path coverage.json
+        .\codecov.exe -f "$env:APPVEYOR_BUILD_FOLDER/coverage.json"
         if ($result.FailedCount -gt 0) {
             throw "$($result.FailedCount) tests failed."
         }

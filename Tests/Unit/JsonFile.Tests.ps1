@@ -1,6 +1,6 @@
 ﻿
 # Begin Testing
-Describe 'Tests for IniFile' {
+Describe 'Tests for JsonFile' {
 
     BeforeAll {
         # Import TestHelper
