@@ -14,13 +14,14 @@ init:
 install:
     - git clone https://github.com/PowerShell/DscResource.Tests
     - ps: |
-        $VerbosePreference = 'Continue'
         $moduleName = 'DSCR_FileContent'
         Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Invoke-AppveyorInstallTask
-        Write-Verbose -Message "PowerShell version $($PSVersionTable.PSVersion)" -Verbose
         $pester =  Get-Module -ListAvailable -Name Pester | sort Version -Descending | select -First 1
+        $VerbosePreference = 'Continue'
+        Write-Verbose -Message "PowerShell version $($PSVersionTable.PSVersion)" -Verbose
         Write-Verbose -Message "Pester version $($pester.Version.ToString())" -Verbose
+        $VerbosePreference = 'SilentlyContinue'
 
 #---------------------------------#
 #      build configuration        #
