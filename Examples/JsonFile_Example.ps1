@@ -1,13 +1,13 @@
-﻿$output = 'F:\JsonTest\MOF'
+﻿$output = 'C:\DSCMOF'
 
 Configuration JsonTest
 {
-    Import-DscResource -ModuleName DSCR_JsonFile
+    Import-DscResource -ModuleName DSCR_FileContent
     Node localhost
     {
-        cJsonFile JsonTest {
+        JsonFile JsonTest {
             Ensure   = "Present"
-            Path     = "F:\JsonTest.json"
+            Path     = "C:\JsonTest.json"
             Key      = 'TestKey'
             Value    = '[true, 123, "Hello"]'  # JSON formatted string
             Encoding = 'utf8NoBOM'   #utf8 without bom

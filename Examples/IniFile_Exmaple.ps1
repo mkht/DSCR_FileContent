@@ -1,11 +1,11 @@
-﻿$output = 'C:\IniTest\MOF'
+﻿$output = 'C:\DSCMOF'
 
 Configuration IniTest
 {
-    Import-DscResource -ModuleName DSCR_IniFile
+    Import-DscResource -ModuleName DSCR_FileContent
     Node localhost
     {
-        cIniFile IniTest
+        IniFile IniTest
         {
             Ensure = "Present"  #create key
             Path = "C:\IniTest.ini"
@@ -15,7 +15,7 @@ Configuration IniTest
             Encoding = 'UTF8'
         }
 
-        cIniFile IniTest2
+        IniFile IniTest2
         {
             Ensure = "Absent"   #remove key
             Path = "C:\IniTest.ini"
