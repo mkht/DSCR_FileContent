@@ -9,7 +9,7 @@ Param (
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string[]]$ExcludeFiles = @('.gitignore', 'appveyor.yml'),
+    [string[]]$ExcludeFiles = @('.gitignore', 'appveyor.yml', 'codecov.yml'),
 
     [switch]$WhatIf
 )
