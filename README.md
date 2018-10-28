@@ -245,6 +245,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 1.0.1
+ + Fixed regression issue.
+
 ### 1.0.0
  + Add `TextFile` resource.
  + DSCR_FileContent is integrated module of [DSCR_IniFile](https://github.com/mkht/DSCR_IniFile) and [DSCR_JsonFile](https://github.com/mkht/DSCR_JsonFile).
