@@ -14,6 +14,7 @@ init:
 install:
     - git clone https://github.com/PowerShell/DscResource.Tests
     - ps: |
+        $VerbosePreference = 'Continue'
         $moduleName = 'DSCR_FileContent'
         Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Invoke-AppveyorInstallTask
