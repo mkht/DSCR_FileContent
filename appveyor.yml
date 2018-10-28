@@ -8,20 +8,17 @@ version: 1.0.{build}
 clone_folder: C:\projects\DSCR_FileContent
 
 init:
-  # Needed for publishing of examples, build worker defaults to core.autocrlf=input.
   - git config --global core.autocrlf true
 
 install:
-    - git clone https://github.com/PowerShell/DscResource.Tests
     - ps: |
         $moduleName = 'DSCR_FileContent'
-        Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
-        Invoke-AppveyorInstallTask
+        Install-PackageProvider -Name NuGet -Force -ErrorAction Stop
+        Write-Host 'Installing NuGet PackageProvide'
+        Install-Module Pester -Force -SkipPublisherCheck
         $pester =  Get-Module -ListAvailable -Name Pester | sort Version -Descending | select -First 1
-        $VerbosePreference = 'Continue'
-        Write-Verbose -Message "PowerShell version $($PSVersionTable.PSVersion)" -Verbose
-        Write-Verbose -Message "Pester version $($pester.Version.ToString())" -Verbose
-        $VerbosePreference = 'SilentlyContinue'
+        Write-Host -Message "PowerShell version $($PSVersionTable.PSVersion)"
+        Write-Host -Message "Pester version $($pester.Version.ToString())"
 
 #---------------------------------#
 #      build configuration        #
@@ -35,16 +32,14 @@ build: false
 
 test_script:
     - ps: |
-        Invoke-AppveyorTestScriptTask `
-            -Type 'Default' `
-            -CodeCoverage `
-            -CodeCovIo `
-            -DisableConsistency `
-            -ExcludeTag @('Markdown')
-
-
-# scripts to run before deployment
-after_test:
-    - ps: |
-        Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
-        Invoke-AppveyorAfterTestTask -ResourceModuleName $moduleName
+        Write-Host -Message "Test Start"
+        $testResultsFile = "$env:APPVEYOR_BUILD_FOLDER/TestsResults.xml"
+        $result = Invoke-Pester -CodeCoverage $env:APPVEYOR_BUILD_FOLDER\DSCResources\*\*.psm1 -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
+        if ($result.FailedCount -gt 0) {
+         throw "$($result.FailedCount) tests failed."
+        }
+        if ($result.PassedCount -eq 0) {
+            throw "No tests passed."
+        }
+        $wc = New-Object 'System.Net.WebClient'
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", "$env:APPVEYOR_BUILD_FOLDER/TestsResults.xml")
