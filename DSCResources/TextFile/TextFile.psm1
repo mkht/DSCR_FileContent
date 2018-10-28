@@ -81,6 +81,12 @@ function Set-TargetResource {
     else {
         # Ensure = 'Present'
 
+        # Create parent directory if not exist
+        $ParentFolder = Split-Path -Path $Path -Parent -ErrorAction SilentlyContinue
+        if ($ParentFolder -and (-not (Test-Path -Path $ParentFolder -PathType Container))) {
+            $null = New-Item -Path $ParentFolder -ItemType Directory -Force -ErrorAction Stop
+        }
+
         # Create empty file when the Contents parameter is not specified
         if ([string]::IsNullOrEmpty($Contents)) {
             $null = New-Item -Path $Path -ItemType File -Force
@@ -98,7 +104,7 @@ function Set-TargetResource {
                     # Append BOM
                     $Encoder.GetPreamble() + $Encoder.GetBytes($_)
                 }
-            } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force
+            } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force -ErrorAction Stop
         }
     }
 } # end of Set-TargetResource

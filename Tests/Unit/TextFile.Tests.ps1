@@ -378,6 +378,18 @@ Describe 'Tests for TextFile' {
                         Test-Path -LiteralPath $txtPath | Should -Be $true
                         (Get-FileHash $txtPath).Hash -eq (Get-FileHash $TestDataPath).Hash | Should -Be $true
                     }
+
+                    It 'Create new txt file when the file not exist (Missing parent directory)' {
+                        $txtPath = (Join-Path $TestDrive '\Parent Folder\test.txt')
+                        $setParam = @{
+                            Ensure   = 'Present'
+                            Path     = $txtPath
+                            Contents = $MockContent
+                        }
+
+                        { Set-TargetResource @setParam } | Should -Not -Throw
+                        Test-Path -LiteralPath $txtPath | Should -Be $true
+                    }
                 }
 
 

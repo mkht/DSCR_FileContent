@@ -367,16 +367,16 @@ function Set-TargetResource {
     # Create directory if not exist
     $ParentFolder = Split-Path -Path $Path -Parent -ErrorAction SilentlyContinue
     if ($ParentFolder -and (-not (Test-Path -Path $ParentFolder -PathType Container))) {
-        $null = New-Item -Path $ParentFolder -ItemType Directory -Force
+        $null = New-Item -Path $ParentFolder -ItemType Directory -Force -ErrorAction Stop
     }
 
     # Save Json file
     if (('utf8', 'utf8NoBOM') -eq $Encoding) {
-        ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Convert-NewLine -NewLine $NewLine | ForEach-Object { [System.Text.Encoding]::UTF8.GetBytes($_) } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force
+        ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Convert-NewLine -NewLine $NewLine | ForEach-Object { [System.Text.Encoding]::UTF8.GetBytes($_) } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force -ErrorAction Stop
         Write-Verbose ('Json file "{0}" has been saved' -f $Path)
     }
     else {
-        ConvertTo-Json -InputObject $JsonHash -Depth 100 | Convert-NewLine -NewLine $NewLine | Set-Content -Path $Path -Encoding $PSEncoder -NoNewline -Force
+        ConvertTo-Json -InputObject $JsonHash -Depth 100 | Convert-NewLine -NewLine $NewLine | Set-Content -Path $Path -Encoding $PSEncoder -NoNewline -Force -ErrorAction Stop
         Write-Verbose ('The key "{0}" will be modified' -f $KeyHierarchy[$i])
         Write-Verbose ('Json file "{0}" has been saved' -f $Path)
     }
