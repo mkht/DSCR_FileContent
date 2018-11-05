@@ -29,7 +29,7 @@ function Convert-NewLine {
         $InputObject.Replace("`r`n", "`n")
     }
     else {
-        $InputObject -replace "[^\r]\n", "`r`n"
+        $InputObject -replace "(?<!\r)\n", "`r`n"
     }
 }
 
