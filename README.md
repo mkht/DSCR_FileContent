@@ -245,7 +245,7 @@ Key1=Value1
 
 ----
 ## ChangeLog
-### 1.0.2
+### 1.0.3
  + Fixed an issue where character at the end of line may not be output correctly when `CRLF` is specified for NewLine.
 
 ### 1.0.1
