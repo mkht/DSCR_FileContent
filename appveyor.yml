@@ -36,7 +36,7 @@ test_script:
     - ps: |
         Write-Host -Message "Test Start"
         $testResultsFile = "$env:APPVEYOR_BUILD_FOLDER/TestsResults.xml"
-        $result = Invoke-Pester -CodeCoverage $env:APPVEYOR_BUILD_FOLDER\DSCResources\*\*.psm1 -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
+        $result = Invoke-Pester -CodeCoverage (Get-ChildItem $env:APPVEYOR_BUILD_FOLDER\DSCResources\**\*.psm1 -Recurse) -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
         Write-Host -Message "Test Finished"
         Write-Host -Message "Uploading test result"
         $wc = New-Object 'System.Net.WebClient'

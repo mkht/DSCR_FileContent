@@ -245,6 +245,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### Unreleased
+ + Add unit tests for helper functions.
+
 ### 1.0.3
  + Fixed an issue where character at the end of line may not be output correctly when `CRLF` is specified for NewLine.
 
