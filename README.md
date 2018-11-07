@@ -18,7 +18,7 @@ PowerShell DSC Resource to create text file.
 
 #### Properties
 + [string] **Ensure** (Write):
-    + Specify the  exists or not.
+    + Specify the file exists or not.
     + The default value is `Present`. (`Present` | `Absent`)
 
 + [string] **Path** (Key):
