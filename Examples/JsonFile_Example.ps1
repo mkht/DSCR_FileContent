@@ -1,32 +1,65 @@
-﻿$output = 'C:\DSCMOF'
+$output = 'C:\DSCMOF'
 
-Configuration JsonTest
+Configuration JsonExample
 {
     Import-DscResource -ModuleName DSCR_FileContent
     Node localhost
     {
-        JsonFile JsonTest {
-            Ensure   = "Present"
-            Path     = "C:\JsonTest.json"
-            Key      = 'TestKey'
-            Value    = '[true, 123, "Hello"]'  # JSON formatted string
-            Encoding = 'utf8NoBOM'   #utf8 without bom
-            NewLine  = 'CRLF'
+        JsonFile Array {
+            Ensure = 'Present'
+            Path   = 'C:\JsonTest.json'
+            Key    = 'ArrayKey'
+            Value  = '[true, 123, "Hello"]'  # JSON formatted string
+        }
+
+        JsonFile Bool {
+            Ensure = 'Present'
+            Path   = 'C:\JsonTest.json'
+            Key    = 'BoolKey'
+            Value  = 'true'
+        }
+
+        JsonFile String {
+            Ensure = 'Present'
+            Path   = 'C:\JsonTest.json'
+            Key    = 'StringKey'
+            Value  = 'Hello PowerShell!'
+        }
+
+        JsonFile Hash {
+            Ensure = 'Present'
+            Path   = 'C:\JsonTest.json'
+            Key    = 'HashKey'
+            Value  = '{"key1": true, "key2": 123}'
+        }
+
+        JsonFile Null {
+            Ensure = 'Present'
+            Path   = 'C:\JsonTest.json'
+            Key    = 'NullKey'
+            Value  = 'null'
         }
     }
 }
 
-JsonTest -OutputPath $output
+JsonExample -OutputPath $output
 Start-DscConfiguration -Path  $output -Verbose -wait
 Remove-DscConfigurationDocument -Stage Current, Previous, Pending -Force
 
 # Expect Output
 <#
 {
-  "TestKey": [
+  "ArrayKey": [
     true,
     123,
     "Hello"
-  ]
+  ],
+  "BoolKey": true,
+  "StringKey": "Hello PowerShell!",
+  "HashKey": {
+    "key1": true,
+    "key2": 123
+  },
+  "NullKey": null
 }
 #>

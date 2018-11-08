@@ -169,8 +169,8 @@ Configuration Example1 {
 The result of executing the above configuration, the following JSON file will output to `C:\Test.json`
 ```json
 {
-  "BoolValue": true,
   "StringValue": "Apple",
+  "BoolValue": true,
   "ArrayValue": [
     true,
     123,
