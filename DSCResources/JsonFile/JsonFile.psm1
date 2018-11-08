@@ -1,4 +1,4 @@
-﻿# Import CommonHelper
+# Import CommonHelper
 $script:dscResourcesFolderFilePath = Split-Path $PSScriptRoot -Parent
 $script:commonHelperFilePath = Join-Path -Path $script:dscResourcesFolderFilePath -ChildPath 'CommonHelper.psm1'
 Import-Module -Name $script:commonHelperFilePath
@@ -122,7 +122,7 @@ function Get-TargetResource {
                         'ArrayElement' {
                             if ($tHash.$tKey -is [Array]) {
                                 $contains = $false
-                                $tHash.$tKey | % {
+                                $tHash.$tKey | ForEach-Object {
                                     if (Compare-MyObject $_ $ValueObject) {
                                         $contains = $true
                                         return
@@ -329,7 +329,7 @@ function Set-TargetResource {
             $JsonHash = @{}
         }
 
-        # Workaroud for ConvertTo-Json bug
+        # Workaround for ConvertTo-Json bug
         # https://github.com/PowerShell/PowerShell/issues/3153
         if ($ValueObject -is [Array]) {
             $ValueObject = $ValueObject.SyncRoot
@@ -558,7 +558,7 @@ function Format-Json {
 
     $indent = 0;
     $result = ($json -Split '\n' |
-            % {
+            ForEach-Object {
             if ($_ -match '[\}\]]') {
                 # This line contains  ] or }, decrement the indentation level
                 $indent--
