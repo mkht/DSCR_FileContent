@@ -406,6 +406,7 @@ function ConvertTo-HashTable {
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
+        [AllowNull()]
         [PSObject]
         $InputObject
     )

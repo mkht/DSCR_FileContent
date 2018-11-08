@@ -246,6 +246,7 @@ Key1=Value1
 ----
 ## ChangeLog
 ### Unreleased
+ + [JsonFile] Fixed an issue that Get-TargetResource throws an exception when the array contains NULL. 
  + [JsonFile] Fixed an issue that empty string and NULL could not be set. [#4](https://github.com/mkht/DSCR_FileContent/issues/3)
  + [JsonFile] Improved to preserve key order when modifying JSON file.
  + [JsonFile] Fixed issue that creating a child key may fail when the parent key has value. [#3](https://github.com/mkht/DSCR_FileContent/issues/3) 
