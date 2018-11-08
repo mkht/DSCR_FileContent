@@ -246,8 +246,9 @@ Key1=Value1
 ----
 ## ChangeLog
 ### Unreleased
- + Fixed issue that creating a child key may fail when the parent key has value. [#3](https://github.com/mkht/DSCR_FileContent/issues/3) 
- + (BREAKING CHANGES) [JsonFile] Changes the behavior when specifying a value that bool or bool parsable to the `Value` parameter. (See [#2](https://github.com/mkht/DSCR_FileContent/issues/2))
+ + [JsonFile] Improved to preserve key order when modifying JSON file.
+ + [JsonFile] Fixed issue that creating a child key may fail when the parent key has value. [#3](https://github.com/mkht/DSCR_FileContent/issues/3) 
+ + [JsonFile] (***BREAKING CHANGES***) Changes the behavior when specifying a value that bool or bool parsable to the `Value` parameter. (See [#2](https://github.com/mkht/DSCR_FileContent/issues/2))
  + Add unit tests for helper functions.
 
 ### 1.0.3

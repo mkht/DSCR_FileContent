@@ -99,7 +99,7 @@ function Get-TargetResource {
             for ($i = 0; $i -lt $KeyHierarchy.Count; $i++) {
                 $local:tKey = $KeyHierarchy[$i]
 
-                if (($null -eq $tHash.GetType().GetMethod('ContainsKey')) -or (-not $tHash.ContainsKey($tKey))) {
+                if (($null -eq $tHash.GetType().GetMethod('Contains')) -or (-not $tHash.Contains($tKey))) {
                     Write-Verbose ('The key "{0}" is not found' -f $tKey)
                     $Result.Ensure = 'Absent'
                     break
@@ -335,10 +335,10 @@ function Set-TargetResource {
         for ($i = 0; $i -lt $KeyHierarchy.Count; $i++) {
             if ($i -lt ($KeyHierarchy.Count - 1)) {
 
-                if (-not $tHash.ContainsKey($KeyHierarchy[$i])) {
+                if (-not $tHash.Contains($KeyHierarchy[$i])) {
                     $tHash.($KeyHierarchy[$i]) = @{}
                 }
-                elseif ($tHash.($KeyHierarchy[$i]) -isnot [hashtable]) {
+                elseif (-not ($tHash.($KeyHierarchy[$i]) -as [hashtable])) {
                     $tHash.($KeyHierarchy[$i]) = @{}
                 }
 
@@ -357,7 +357,7 @@ function Set-TargetResource {
                                 $tHash.($KeyHierarchy[$i]) += $ValueObject
                             }
                         }
-                        elseif ($tHash.ContainsKey($KeyHierarchy[$i])) {
+                        elseif ($tHash.Contains($KeyHierarchy[$i])) {
                             $newValue = @($tHash.($KeyHierarchy[$i]), $ValueObject)
                             Write-Verbose ('The key "{0}" will be modified' -f $KeyHierarchy[$i])
                             $tHash.($KeyHierarchy[$i]) = $newValue
@@ -398,6 +398,7 @@ function Set-TargetResource {
 function ConvertTo-HashTable {
 
     [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
         [PSObject]
@@ -408,7 +409,7 @@ function ConvertTo-HashTable {
         return $InputObject
     }
 
-    $Output = @{}
+    $Output = [ordered]@{}
     $InputObject.psobject.properties | Where-Object {$_.MemberType -eq 'NoteProperty'} | ForEach-Object {
 
 
