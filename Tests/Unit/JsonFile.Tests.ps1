@@ -257,6 +257,18 @@ Describe 'Tests for JsonFile' {
                     $result.Key | Should -Be $getParam.Key
                     $result.Value | Should -Be 'true'
                 }
+
+                It 'Should return Absent when the key value was not fount (SubDictionary, When the parent key has value that the type is not hashtable)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'Boolean/SubDicKey2'
+                        Value = 'true'
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Absent'
+                }
             }
 
 
@@ -655,6 +667,21 @@ Describe 'Tests for JsonFile' {
                     $result.SubDictionary.SubDicKey1.k1 | Should -Be $true
                     $result.SubDictionary.SubDicKey1.k2 | Should -Be 345
                     $result.SubDictionary.SubDicKey1.k3 | Should -Be "ABC"
+                }
+
+                It 'Modify exist Key Value Pair (SubDictionary, When the parent key has value that the type is not hashtable)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'Boolean/SubDicKey1'
+                        Value  = 'true'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.Boolean.SubDicKey1 | Should -BeOfType [bool]
+                    $result.Boolean.SubDicKey1 | Should -Be $true
                 }
 
                 It 'Add element to exist Array Value (Mode = "ArrayElement")' {

@@ -99,7 +99,7 @@ function Get-TargetResource {
             for ($i = 0; $i -lt $KeyHierarchy.Count; $i++) {
                 $local:tKey = $KeyHierarchy[$i]
 
-                if (-not $tHash.ContainsKey($tKey)) {
+                if (($null -eq $tHash.GetType().GetMethod('ContainsKey')) -or (-not $tHash.ContainsKey($tKey))) {
                     Write-Verbose ('The key "{0}" is not found' -f $tKey)
                     $Result.Ensure = 'Absent'
                     break
