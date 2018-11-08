@@ -1,4 +1,4 @@
-﻿# Import CommonHelper
+# Import CommonHelper
 $script:dscResourcesFolderFilePath = Split-Path $PSScriptRoot -Parent
 $script:commonHelperFilePath = Join-Path -Path $script:dscResourcesFolderFilePath -ChildPath 'CommonHelper.psm1'
 Import-Module -Name $script:commonHelperFilePath
