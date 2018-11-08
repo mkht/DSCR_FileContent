@@ -58,7 +58,12 @@ function Get-TargetResource {
         catch {}
 
         if ($null -eq $tmp) {
-            $ValueObject = $Value
+            if ([bool]::TryParse($Value, [ref]$null)) {
+                $ValueObject = [bool]::Parse($Value)
+            }
+            else {
+                $ValueObject = $Value
+            }
         }
         elseif ($tmp.GetType().Name -eq 'PSCustomObject') {
             $ValueObject = ConvertTo-HashTable -InputObject $tmp
@@ -244,7 +249,12 @@ function Set-TargetResource {
         catch {}
 
         if ($null -eq $tmp) {
-            $ValueObject = $Value
+            if ([bool]::TryParse($Value, [ref]$null)) {
+                $ValueObject = [bool]::Parse($Value)
+            }
+            else {
+                $ValueObject = $Value
+            }
         }
         elseif ($tmp.GetType().Name -eq 'PSCustomObject') {
             $ValueObject = ConvertTo-HashTable -InputObject $tmp

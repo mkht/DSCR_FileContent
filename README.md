@@ -246,6 +246,7 @@ Key1=Value1
 ----
 ## ChangeLog
 ### Unreleased
+ + (BREAKING CHANGES) [JsonFile] Changes the behavior when specifying a value that bool or bool parsable to the `Value` parameter. (See [#2](https://github.com/mkht/DSCR_FileContent/issues/2))
  + Add unit tests for helper functions.
 
 ### 1.0.3

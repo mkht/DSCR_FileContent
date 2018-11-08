@@ -80,7 +80,7 @@ Describe 'Tests for JsonFile' {
                     $result.Value | Should -Be '12345'
                 }
 
-                It 'Get exist Key Value Pair (bool)' {
+                It 'Get exist Key Value Pair (bool case 1)' {
                     $jsonPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
                         Path  = $jsonPath
@@ -90,6 +90,51 @@ Describe 'Tests for JsonFile' {
 
                     $result = Get-TargetResource @getParam
                     $result.Ensure | Should -Be 'Present'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    $result.Value | Should -BeExactly 'true'
+                }
+
+                It 'Get exist Key Value Pair (bool case 2)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'Boolean'
+                        Value = 'True'
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Present'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    $result.Value | Should -BeExactly 'true'
+                }
+
+                It 'Get exist Key Value Pair (bool case 3)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'Boolean'
+                        Value = $true
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Present'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    $result.Value | Should -Be 'true'
+                }
+
+                It 'Get exist Key Value Pair (bool like string)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'Boolean'
+                        Value = '"true"'
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Absent'
                     $result.Path | Should -Be $getParam.Path
                     $result.Key | Should -Be $getParam.Key
                     $result.Value | Should -Be 'true'
@@ -453,21 +498,67 @@ Describe 'Tests for JsonFile' {
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.IntZ | Should -BeOfType [int]
                     $result.IntZ | Should -Be 56789
                 }
 
-                It 'Add Key Value Pair to Json when the key not exist (bool)' {
+                It 'Add Key Value Pair to Json when the key not exist (bool case 1)' {
                     $jsonPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
                         Ensure = 'Present'
                         Path   = $jsonPath
-                        Key    = 'BoolZ'
+                        Key    = 'Bool1'
                         Value  = 'false'
                     }
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
-                    $result.BoolZ | Should -Be $false
+                    $result.Bool1 | Should -BeOfType [bool]
+                    $result.Bool1 | Should -Be $false
+                }
+
+                It 'Add Key Value Pair to Json when the key not exist (bool case 2)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'Bool2'
+                        Value  = 'FALSE'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.Bool2 | Should -BeOfType [bool]
+                    $result.Bool2 | Should -Be $false
+                }
+
+                It 'Add Key Value Pair to Json when the key not exist (bool case 3)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'Bool3'
+                        Value  = $true
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.Bool3 | Should -BeOfType [bool]
+                    $result.Bool3 | Should -Be $true
+                }
+
+                It 'Add Key Value Pair to Json when the key not exist (bool like string)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'Bool4'
+                        Value  = '"true"'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.Bool4 | Should -BeExactly 'true'
                 }
 
                 It 'Add Key Value Pair to Json when the key not exist (Array)' {
