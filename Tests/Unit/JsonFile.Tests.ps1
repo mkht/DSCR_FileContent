@@ -19,8 +19,10 @@ Describe 'Tests for JsonFile' {
         $MockJsonFile1 = @'
     {
         "String": "StringValue",
+        "EmptyString": "",
         "Integer": 12345,
         "Boolean": true,
+        "NULL": null,
         "Array": [
             "ArrayValue1",
             "ArrayValue2",
@@ -63,6 +65,21 @@ Describe 'Tests for JsonFile' {
                     $result.Path | Should -Be $getParam.Path
                     $result.Key | Should -Be $getParam.Key
                     $result.Value | Should -Be '"StringValue"'
+                }
+
+                It 'Get exist Key Value Pair (empty string)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'EmptyString'
+                        Value = ''
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Present'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    $result.Value | Should -BeExactly '""'
                 }
 
                 It 'Get exist Key Value Pair (int)' {
@@ -138,6 +155,21 @@ Describe 'Tests for JsonFile' {
                     $result.Path | Should -Be $getParam.Path
                     $result.Key | Should -Be $getParam.Key
                     $result.Value | Should -Be 'true'
+                }
+
+                It 'Get exist Key Value Pair (NULL)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'NULL'
+                        Value = 'null'
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Present'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    ($null -eq $result.Value) | Should -BeTrue
                 }
 
                 It 'Get exist Key Value Pair (Array)' {
@@ -496,7 +528,21 @@ Describe 'Tests for JsonFile' {
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
-                    $result.StringZ | Should -Be 'ValueZ'
+                    $result.StringZ | Should -BeExactly 'ValueZ'
+                }
+
+                It 'Add Key Value Pair to Json when the key not exist (empty string)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'StringZ'
+                        Value  = ''
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.StringZ | Should -BeExactly ''
                 }
 
                 It 'Add Key Value Pair to Json when the key not exist (int)' {
@@ -573,6 +619,20 @@ Describe 'Tests for JsonFile' {
                     $result.Bool4 | Should -BeExactly 'true'
                 }
 
+                It 'Add Key Value Pair to Json when the key not exist (NULL)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'nullZ'
+                        Value  = 'null'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    ($null -eq $result.nullZ) | Should -BeTrue
+                }
+
                 It 'Add Key Value Pair to Json when the key not exist (Array)' {
                     $jsonPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
@@ -639,7 +699,7 @@ Describe 'Tests for JsonFile' {
                     $result.ArrayX[0] | Should -Be 'ArrayElementX'
                 }
 
-                It 'Modify exist Key Value Pair' {
+                It 'Modify exist Key Value Pair (string)' {
                     $jsonPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
                         Ensure = 'Present'
@@ -650,7 +710,35 @@ Describe 'Tests for JsonFile' {
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
-                    $result.String | Should -Be 'ModValue'
+                    $result.String | Should -BeExactly 'ModValue'
+                }
+
+                It 'Modify exist Key Value Pair (empty string)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'String'
+                        Value  = ''
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.String | Should -BeExactly ''
+                }
+
+                It 'Modify exist Key Value Pair (empty string)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'String'
+                        Value  = 'null'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    ($null -eq $result.String) | Should -BeTrue
                 }
 
                 It 'Modify exist Key Value Pair (SubDictionary)' {

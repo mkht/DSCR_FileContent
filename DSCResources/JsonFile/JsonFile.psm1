@@ -24,6 +24,7 @@ function Get-TargetResource {
         $Key,
 
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]
         $Value,
 
@@ -51,26 +52,27 @@ function Get-TargetResource {
     }
 
     $ValueObject = $null
-    if ($Value) {
-        $tmp = try {
-            ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
-        }
-        catch {}
+    $tmp = try {
+        ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+    }
+    catch {}
 
-        if ($null -eq $tmp) {
-            if ([bool]::TryParse($Value, [ref]$null)) {
-                $ValueObject = [bool]::Parse($Value)
-            }
-            else {
-                $ValueObject = $Value
-            }
+    if ($null -eq $tmp) {
+        if ([bool]::TryParse($Value, [ref]$null)) {
+            $ValueObject = [bool]::Parse($Value)
         }
-        elseif ($tmp.GetType().Name -eq 'PSCustomObject') {
-            $ValueObject = ConvertTo-HashTable -InputObject $tmp
+        elseif ($Value -eq 'null') {
+            $ValueObject = $null
         }
         else {
-            $ValueObject = $tmp
+            $ValueObject = $Value
         }
+    }
+    elseif ($tmp.GetType().Name -eq 'PSCustomObject') {
+        $ValueObject = ConvertTo-HashTable -InputObject $tmp
+    }
+    else {
+        $ValueObject = $tmp
     }
 
     # check file exists
@@ -173,6 +175,7 @@ function Test-TargetResource {
         $Key,
 
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]
         $Value,
 
@@ -220,6 +223,7 @@ function Set-TargetResource {
         $Key,
 
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]
         $Value,
 
@@ -242,26 +246,27 @@ function Set-TargetResource {
     $PSEncoder = Get-PSEncoding -Encoding $Encoding
 
     $ValueObject = $null
-    if ($Value) {
-        $tmp = try {
-            ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
-        }
-        catch {}
+    $tmp = try {
+        ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+    }
+    catch {}
 
-        if ($null -eq $tmp) {
-            if ([bool]::TryParse($Value, [ref]$null)) {
-                $ValueObject = [bool]::Parse($Value)
-            }
-            else {
-                $ValueObject = $Value
-            }
+    if ($null -eq $tmp) {
+        if ([bool]::TryParse($Value, [ref]$null)) {
+            $ValueObject = [bool]::Parse($Value)
         }
-        elseif ($tmp.GetType().Name -eq 'PSCustomObject') {
-            $ValueObject = ConvertTo-HashTable -InputObject $tmp
+        elseif ($Value -eq 'null') {
+            $ValueObject = $null
         }
         else {
-            $ValueObject = $tmp
+            $ValueObject = $Value
         }
+    }
+    elseif ($tmp.GetType().Name -eq 'PSCustomObject') {
+        $ValueObject = ConvertTo-HashTable -InputObject $tmp
+    }
+    else {
+        $ValueObject = $tmp
     }
 
     $JsonHash = $null
