@@ -403,7 +403,7 @@ function Set-TargetResource {
 function ConvertTo-HashTable {
 
     [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    [OutputType([hashtable])]
     param(
         [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
         [AllowNull()]
