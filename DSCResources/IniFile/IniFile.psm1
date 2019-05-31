@@ -1,3 +1,7 @@
+#Require -Version 5.0
+
+using namespace System.Collections.Specialized
+
 # Import CommonHelper
 $script:dscResourcesFolderFilePath = Split-Path $PSScriptRoot -Parent
 $script:commonHelperFilePath = Join-Path -Path $script:dscResourcesFolderFilePath -ChildPath 'CommonHelper.psm1'
@@ -316,7 +320,7 @@ function Get-IniFile {
         $PSEncoder = Get-PSEncoding -Encoding $Encoding
         $Content = Get-Content -Path $Path -Encoding $PSEncoder
         $CurrentSection = '_ROOT_'
-        [System.Collections.Specialized.OrderedDictionary]$IniHash = [ordered]@{ }
+        [OrderedDictionary]$IniHash = [ordered]@{ }
         $IniHash.Add($CurrentSection, [ordered]@{ })
 
         foreach ($line in $Content) {
@@ -373,7 +377,7 @@ function ConvertTo-IniString {
     (
         [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline)]
         [ValidateScript( {
-                if (($_ -as [System.Collections.Specialized.OrderedDictionary]) -or ($_ -as [hashtable])) {
+                if (Test-IsOrderedOrHash $_) {
                     $true
                 }
                 else {
@@ -385,16 +389,15 @@ function ConvertTo-IniString {
 
     Process {
         $IniString = New-Object 'System.Collections.Generic.List[System.String]'
+        $RootKey = '_ROOT_'
 
-        $HasRootSection = if ($InputObject -as [System.Collections.Specialized.OrderedDictionary]) {
-            $InputObject.Contains('_ROOT_')
+        if (-not ($InputObject -as [OrderedDictionary])) {
+            $InputObject = ConvertTo-OrderedDictionary -HashTable $InputObject
         }
-        else {
-            $InputObject.ContainsKey('_ROOT_')
-        }
-        if ($HasRootSection) {
-            if ($InputObject.'_ROOT_' -as [hashtable]) {
-                $private:Keys = $InputObject.'_ROOT_'
+
+        if ($InputObject.Contains($RootKey)) {
+            if (Test-IsOrderedOrHash $InputObject.$RootKey) {
+                $private:Keys = $InputObject.$RootKey
                 $Keys.Keys.ForEach( {
                         $IniString.Add(('{0}={1}' -f $_, $Keys.$_))
                     })
@@ -403,8 +406,8 @@ function ConvertTo-IniString {
         }
 
         foreach ($Section in $InputObject.keys) {
-            if (-not ($Section -eq '_ROOT_')) {
-                if ($InputObject.$Section -as [hashtable]) {
+            if (-not ($Section -eq $RootKey)) {
+                if (Test-IsOrderedOrHash $InputObject.$Section) {
                     $IniString.Add(('[{0}]' -f $Section))
                     $private:Keys = $InputObject.$Section
                     $Keys.Keys.ForEach( {
@@ -459,7 +462,14 @@ function Set-IniKey {
     param
     (
         [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline)]
-        [System.Collections.Specialized.OrderedDictionary]
+        [ValidateScript( {
+                if (Test-IsOrderedOrHash $_) {
+                    $true
+                }
+                else {
+                    throw 'The value type of InputObject should be "System.Collections.Specialized.OrderedDictionary" or "System.Collections.Hashtable"'
+                }
+            })]
         $InputObject,
 
         [Parameter(Mandatory = $true)]
@@ -478,20 +488,30 @@ function Set-IniKey {
     )
 
     Process {
+        if (-not ($InputObject -as [OrderedDictionary])) {
+            $InputObject = ConvertTo-OrderedDictionary -HashTable $InputObject
+        }
+
         if ($InputObject.Contains($Section)) {
             if ($Key) {
-                if ($InputObject.$Section.Contains($Key)) {
-                    Write-Verbose ("Update value. Key:'{0}'; Value:'{1}'; Section:'{2}'" -f $key, $Value, $Section)
-                    $InputObject.$Section.$Key = $Value
-                }
-                else {
-                    Write-Verbose ("Set value. Key:'{0}'; Value:'{1}'; Section:'{2}'" -f $key, $Value, $Section)
-                    $InputObject.$Section.Add($Key, $Value)
+                if (Test-IsOrderedOrHash $InputObject.$Section) {
+                    if (-not ($InputObject.$Section -as [OrderedDictionary])) {
+                        $InputObject.$Section = ConvertTo-OrderedDictionary -HashTable $InputObject.$Section
+                    }
+
+                    if ($InputObject.$Section.Contains($Key)) {
+                        Write-Verbose ("Update value. Key:'{0}'; Value:'{1}'; Section:'{2}'" -f $key, $Value, $Section)
+                        $InputObject.$Section.$Key = $Value
+                    }
+                    else {
+                        Write-Verbose ("Set value. Key:'{0}'; Value:'{1}'; Section:'{2}'" -f $key, $Value, $Section)
+                        $InputObject.$Section.Add($Key, $Value)
+                    }
                 }
             }
         }
         else {
-            $InputObject.Add($Section, [System.Collections.Specialized.OrderedDictionary]@{ })
+            $InputObject.Add($Section, [OrderedDictionary]@{ })
             if ($Key) {
                 Write-Verbose ("Set value. Key:'{0}'; Value:'{1}'; Section:'{2}'" -f $key, $Value, $Section)
                 $InputObject.$Section.Add($Key, $Value)
@@ -540,7 +560,14 @@ function Remove-IniKey {
     param
     (
         [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline)]
-        [System.Collections.Specialized.OrderedDictionary]
+        [ValidateScript( {
+                if (Test-IsOrderedOrHash $_) {
+                    $true
+                }
+                else {
+                    throw 'The value type of InputObject should be "System.Collections.Specialized.OrderedDictionary" or "System.Collections.Hashtable"'
+                }
+            })]
         $InputObject,
 
         [Parameter(Mandatory = $true)]
@@ -555,14 +582,24 @@ function Remove-IniKey {
     )
 
     Process {
+        if (-not ($InputObject -as [OrderedDictionary])) {
+            $InputObject = ConvertTo-OrderedDictionary -HashTable $InputObject
+        }
+
         if ($InputObject.Contains($Section)) {
             if ($Key) {
-                if ($InputObject.$Section.Contains($Key)) {
-                    $InputObject.$Section.Remove($key)
+                if (Test-IsOrderedOrHash $InputObject.$Section) {
+                    if (-not ($InputObject.$Section -as [OrderedDictionary])) {
+                        $InputObject.$Section = ConvertTo-OrderedDictionary -HashTable $InputObject.$Section
+                    }
 
-                    # when all key is removed, also remove section
-                    if ($InputObject.$Section.Count -le 0) {
-                        $InputObject.Remove($Section)
+                    if ($InputObject.$Section.Contains($Key)) {
+                        $InputObject.$Section.Remove($key)
+
+                        # when all key is removed, also remove section
+                        if ($InputObject.$Section.Count -le 0) {
+                            $InputObject.Remove($Section)
+                        }
                     }
                 }
             }
@@ -577,6 +614,35 @@ function Remove-IniKey {
             $InputObject
         }
     }
+}
+
+
+function ConvertTo-OrderedDictionary {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    Param
+    (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [hashtable]
+        $HashTable
+    )
+
+    $ordered = [ordered]@{ }
+    foreach ($key in $HashTable.keys) {
+        $ordered.Add($key, $HashTable[$key])
+    }
+    $ordered
+}
+
+function Test-IsOrderedOrHash {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    Param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [Object]$InputObject
+    )
+
+    ($InputObject -as [OrderedDictionary]) -or ($InputObject -as [hashtable])
 }
 
 
