@@ -112,6 +112,7 @@ The result of executing the above configuration, the following ini file will out
 ```
 Fruit_A=Apple
 Fruit_B=Banana
+
 [Animals]
 Animal_A=Ant
 ```
@@ -246,7 +247,7 @@ Key1=Value1
 ----
 ## ChangeLog
 ### 2.1.0
- + The functions `ConvertTo-IniString`, `Set-IniKey`, `Remove-IniKey` accept not only [System.Collections.Specialized.OrderedDictionary] but also [hashtable] input types.
+ + The functions `ConvertTo-IniString`, `Set-IniKey`, `Remove-IniKey` accept not only `[System.Collections.Specialized.OrderedDictionary]` but also `[hashtable]` input types.
  + [IniFile] Add a blank line to the beginning of sections.
  + [IniFile] Improved performance when dealing with large files.
  + Misc fixes.
