@@ -245,6 +245,12 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 2.1.0
+ + The functions `ConvertTo-IniString`, `Set-IniKey`, `Remove-IniKey` accept not only [System.Collections.Specialized.OrderedDictionary] but also [hashtable] input types.
+ + [IniFile] Add a blank line to the beginning of sections.
+ + [IniFile] Improved performance when dealing with large files.
+ + Misc fixes.
+
 ### 2.0.0
  + [JsonFile] Fixed an issue that Get-TargetResource throws an exception when the array contains NULL. 
  + [JsonFile] Fixed an issue that empty string and NULL could not be set. [#4](https://github.com/mkht/DSCR_FileContent/issues/4)
