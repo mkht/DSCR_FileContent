@@ -19,9 +19,11 @@ Describe 'Tests for IniFile' {
 Key1=Value1
 Key2=Value2
 Key3=
+
 [SectionA]
 KeySA1=ValueSA1
 KeySA2=ValueSA2
+
 [SectionB]
 
 "@
@@ -38,7 +40,7 @@ KeySA2=ValueSA2
                 KeySA2 = 'ValueSA2'
             }
 
-            SectionB = [ordered]@{}
+            SectionB = [ordered]@{ }
         }
 
         #endregion Set variables for testing
@@ -50,8 +52,8 @@ KeySA2=ValueSA2
                 return $MockIniObject1
             }
 
-            Mock Test-Path {$true} -ParameterFilter {$Path -eq $ExistMock}
-            Mock Test-Path {$false} -ParameterFilter {$Path -eq $NonExistMock}
+            Mock Test-Path { $true } -ParameterFilter { $Path -eq $ExistMock }
+            Mock Test-Path { $false } -ParameterFilter { $Path -eq $NonExistMock }
 
             Context 'Ensure = Present' {
 
@@ -185,12 +187,12 @@ KeySA2=ValueSA2
                 return $MockIniObject1
             }
 
-            Mock Test-Path {$true} -ParameterFilter {$Path -eq $ExistMock}
-            Mock Test-Path {$false} -ParameterFilter {$Path -eq $NonExistMock}
+            Mock Test-Path { $true } -ParameterFilter { $Path -eq $ExistMock }
+            Mock Test-Path { $false } -ParameterFilter { $Path -eq $NonExistMock }
 
             Context 'Ensure = Present' {
 
-                Mock Test-Path {$true}
+                Mock Test-Path { $true }
 
                 It 'Should return $true when the key value pair exist (with ROOT section)' {
                     $getParam = @{
@@ -454,7 +456,7 @@ KeySA2=ValueSA2
                         KeySA2 = 'ValueSA2'
                     }
 
-                    SectionB = [ordered]@{}
+                    SectionB = [ordered]@{ }
                 }
             }
 
@@ -481,7 +483,7 @@ KeySA2=ValueSA2
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     Test-Path -LiteralPath $path | Should -Be $true
-                    Get-Content -Path $path -Encoding utf8 | Should -Be 'KeyX=ValueX'
+                    Get-Content -Path $path -Encoding utf8 -Raw | Should -Be "KeyX=ValueX`r`n`r`n"
                 }
 
                 It 'Create new ini file when the file not exist (create with parent folder)' {
@@ -497,7 +499,7 @@ KeySA2=ValueSA2
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     Test-Path -LiteralPath $path | Should -Be $true
-                    Get-Content -Path $path -Encoding utf8 | Should -Be 'KeyX=ValueX'
+                    Get-Content -Path $path -Encoding utf8 -Raw | Should -Be "KeyX=ValueX`r`n`r`n"
                 }
 
                 It 'Add Key Value Pair to ini (ROOT section)' {
@@ -530,7 +532,7 @@ KeySA2=ValueSA2
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     $content = Get-Content -Path $path -Encoding utf8
-                    $content[6] | Should -Be 'KeySA3=ValueSA3'
+                    $content[7] | Should -Be 'KeySA3=ValueSA3'
                 }
 
                 It 'Add Section and Key Value Pair to ini' {
@@ -546,8 +548,8 @@ KeySA2=ValueSA2
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     $content = Get-Content -Path $path -Encoding utf8
-                    $content[7] | Should -Be '[SectionC]'
-                    $content[8] | Should -Be 'KeySC1=ValueSC1'
+                    $content[10] | Should -Be '[SectionC]'
+                    $content[11] | Should -Be 'KeySC1=ValueSC1'
                 }
 
 
@@ -563,7 +565,7 @@ KeySA2=ValueSA2
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     $content = Get-Content -Path $path -Encoding utf8
-                    $content[7] | Should -Be '[SectionC]'
+                    $content[10] | Should -Be '[SectionC]'
                 }
 
                 It 'Mod Value (ROOT section)' {
@@ -596,22 +598,6 @@ KeySA2=ValueSA2
                     $content = Get-Content -Path $path -Encoding utf8
                     $content[1] | Should -Be 'Key2='
                 }
-
-                It 'Nothing Changed if test passed' {
-                    $path = (Join-Path $TestDrive 'MockIni.ini')
-                    $getParam = @{
-                        Ensure  = 'Present'
-                        Path    = $path
-                        Key     = 'Key1'
-                        Value   = 'Value1'
-                        Section = ''
-                    }
-
-                    { Set-TargetResource @getParam } | Should -Not -Throw
-
-                    $content = Get-Content -Path $path -Raw -Encoding utf8
-                    $content | Should -Be $MockIniFile1
-                }
             }
 
             Context 'Ensure = Absent' {
@@ -628,53 +614,6 @@ KeySA2=ValueSA2
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     Test-Path -LiteralPath $path | Should -Be $false
-                }
-
-
-                It 'Nothing to do if target key not exist (ROOT section)' {
-                    $path = (Join-Path $TestDrive 'MockIni.ini')
-                    $getParam = @{
-                        Ensure  = 'Absent'
-                        Path    = $path
-                        Key     = 'KeyX'
-                        Section = ''
-                    }
-
-                    { Set-TargetResource @getParam } | Should -Not -Throw
-
-                    $content = Get-Content -Path $path -Raw -Encoding utf8
-                    $content | Should -Be $MockIniFile1
-                }
-
-                It 'Nothing to do if target key not exist (specified section)' {
-                    $path = (Join-Path $TestDrive 'MockIni.ini')
-                    $getParam = @{
-                        Ensure  = 'Absent'
-                        Path    = $path
-                        Key     = 'Key1'
-                        Section = 'SectionA'
-                    }
-
-                    { Set-TargetResource @getParam } | Should -Not -Throw
-
-                    $content = Get-Content -Path $path -Raw -Encoding utf8
-                    $content | Should -Be $MockIniFile1
-                }
-
-
-                It 'Nothing to do if target section not exist ()' {
-                    $path = (Join-Path $TestDrive 'MockIni.ini')
-                    $getParam = @{
-                        Ensure  = 'Absent'
-                        Path    = $path
-                        Key     = ''
-                        Section = 'SectionX'
-                    }
-
-                    { Set-TargetResource @getParam } | Should -Not -Throw
-
-                    $content = Get-Content -Path $path -Raw -Encoding utf8
-                    $content | Should -Be $MockIniFile1
                 }
 
 

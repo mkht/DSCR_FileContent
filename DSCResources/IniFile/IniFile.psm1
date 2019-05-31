@@ -61,7 +61,7 @@ function Get-TargetResource {
         $NewLine = 'CRLF'
     )
 
-    if (-not $Section) {$Section = '_ROOT_'}
+    if (-not $Section) { $Section = '_ROOT_' }
     [string]$tmpValue = ''
 
     # check file exists
@@ -150,7 +150,7 @@ function Set-TargetResource {
 
     $PSEncoder = Get-PSEncoding -Encoding $Encoding
 
-    if (-not $Section) {$Section = '_ROOT_'}
+    if (-not $Section) { $Section = '_ROOT_' }
 
     # Ensure = 'Absent'
     if ($Ensure -eq [Ensure]::Absent) {
@@ -169,7 +169,7 @@ function Set-TargetResource {
     }
     else {
         # Ensure = 'Present'
-        $Ini = [ordered]@{}
+        $Ini = [ordered]@{ }
         if (Test-Path $Path) {
             $Ini = Get-IniFile -Path $Path -Encoding $Encoding
         }
@@ -230,7 +230,7 @@ function Test-TargetResource {
         $NewLine = 'CRLF'
     )
 
-    if (-not $Section) {$Section = '_ROOT_'}
+    if (-not $Section) { $Section = '_ROOT_' }
 
     $Ret = ($Ensure -eq [Ensure]::Present)
 
@@ -300,7 +300,7 @@ function Get-IniFile {
     (
         # Set Target full path to INI
         [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline)]
-        [validateScript( {Test-Path $_})]
+        [validateScript( { Test-Path $_ })]
         [Alias('File')]
         [string]
         $Path,
@@ -316,8 +316,8 @@ function Get-IniFile {
         $PSEncoder = Get-PSEncoding -Encoding $Encoding
         $Content = Get-Content -Path $Path -Encoding $PSEncoder
         $CurrentSection = '_ROOT_'
-        [System.Collections.Specialized.OrderedDictionary]$IniHash = [ordered]@{}
-        $IniHash.Add($CurrentSection, [ordered]@{})
+        [System.Collections.Specialized.OrderedDictionary]$IniHash = [ordered]@{ }
+        $IniHash.Add($CurrentSection, [ordered]@{ })
 
         foreach ($line in $Content) {
             $line = $line.Trim()
@@ -331,7 +331,7 @@ function Get-IniFile {
                 $CurrentSection = $Matches[1]
                 if (-not $IniHash.Contains($CurrentSection)) {
                     # Write-Verbose ('Add Section. Section: {0}' -f $Matches[1])
-                    $IniHash.Add($CurrentSection, [ordered]@{})
+                    $IniHash.Add($CurrentSection, [ordered]@{ })
                 }
             }
             elseif ($line -match '=') {
@@ -384,6 +384,7 @@ function ConvertTo-IniString {
                 $Keys.Keys.ForEach( {
                         $IniString += ('{0}={1}' -f $_, $Keys.$_)
                     })
+                $IniString += ''
             }
         }
 
@@ -395,6 +396,7 @@ function ConvertTo-IniString {
                     $Keys.Keys.ForEach( {
                             $IniString += ('{0}={1}' -f $_, $Keys.$_)
                         })
+                    $IniString += ''
                 }
             }
         }
@@ -476,7 +478,7 @@ function Set-IniKey {
             }
         }
         else {
-            $InputObject.Add($Section, [System.Collections.Specialized.OrderedDictionary]@{})
+            $InputObject.Add($Section, [System.Collections.Specialized.OrderedDictionary]@{ })
             if ($Key) {
                 Write-Verbose ("Set value. Key:'{0}'; Value:'{1}'; Section:'{2}'" -f $key, $Value, $Section)
                 $InputObject.$Section.Add($Key, $Value)
