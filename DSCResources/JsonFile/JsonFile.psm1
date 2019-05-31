@@ -55,7 +55,7 @@ function Get-TargetResource {
     $tmp = try {
         ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
     }
-    catch {}
+    catch { }
 
     if ($null -eq $tmp) {
         if ([bool]::TryParse($Value, [ref]$null)) {
@@ -86,7 +86,7 @@ function Get-TargetResource {
             $PSEncoder = Get-PSEncoding -Encoding $Encoding
             Get-Content -Path $Path -Raw -Encoding $PSEncoder | ConvertFrom-Json -ErrorAction Ignore
         }
-        catch {}
+        catch { }
 
         if (-not $Json) {
             Write-Verbose ("Couldn't read {0}" -f $Path)
@@ -197,8 +197,8 @@ function Test-TargetResource {
 
     [bool]$result = (Get-TargetResource @PSBoundParameters).Ensure -eq $Ensure
 
-    if ($result) {Write-Verbose 'The test passed'}
-    else {Write-Verbose 'The test failed'}
+    if ($result) { Write-Verbose 'The test passed' }
+    else { Write-Verbose 'The test failed' }
 
     return $result
 }
@@ -249,7 +249,7 @@ function Set-TargetResource {
     $tmp = try {
         ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
     }
-    catch {}
+    catch { }
 
     if ($null -eq $tmp) {
         if ([bool]::TryParse($Value, [ref]$null)) {
@@ -277,7 +277,7 @@ function Set-TargetResource {
                 ConvertTo-HashTable -InputObject $Json
             }
         }
-        catch {}
+        catch { }
     }
 
     # Ensure = "Absent"
@@ -300,7 +300,7 @@ function Set-TargetResource {
                                 $tmpex = $expression + (".{0}" -f $KeyHierarchy[$i])
                                 $v = Invoke-Expression -Command $tmpex
                                 if ($v -is [Array]) {
-                                    $script:newValue = $v | Where-Object {-not (Compare-MyObject $_ $ValueObject)}
+                                    $script:newValue = $v | Where-Object { -not (Compare-MyObject $_ $ValueObject) }
                                     if ($null -eq $script:newValue) {
                                         Write-Verbose ('The key "{0}" will be removed' -f $KeyHierarchy[$i])
                                         $expression += (".Remove('{0}')" -f $KeyHierarchy[$i])
@@ -326,7 +326,7 @@ function Set-TargetResource {
     else {
         # Ensure = "Present"
         if ($null -eq $JsonHash) {
-            $JsonHash = @{}
+            $JsonHash = @{ }
         }
 
         # Workaround for ConvertTo-Json bug
@@ -341,10 +341,10 @@ function Set-TargetResource {
             if ($i -lt ($KeyHierarchy.Count - 1)) {
 
                 if (-not $tHash.Contains($KeyHierarchy[$i])) {
-                    $tHash.($KeyHierarchy[$i]) = @{}
+                    $tHash.($KeyHierarchy[$i]) = @{ }
                 }
                 elseif (-not ($tHash.($KeyHierarchy[$i]) -as [hashtable])) {
-                    $tHash.($KeyHierarchy[$i]) = @{}
+                    $tHash.($KeyHierarchy[$i]) = @{ }
                 }
 
                 $tHash = $tHash.($KeyHierarchy[$i])
@@ -357,7 +357,7 @@ function Set-TargetResource {
 
                     'ArrayElement' {
                         if ($tHash.($KeyHierarchy[$i]) -is [Array]) {
-                            if ($tHash.($KeyHierarchy[$i]) | Where-Object { -not (Compare-MyObject $_ $ValueObject)}) {
+                            if ($tHash.($KeyHierarchy[$i]) | Where-Object { -not (Compare-MyObject $_ $ValueObject) }) {
                                 Write-Verbose ('The key "{0}" will be modified' -f $KeyHierarchy[$i])
                                 $tHash.($KeyHierarchy[$i]) += $ValueObject
                             }
@@ -415,15 +415,15 @@ function ConvertTo-HashTable {
         return $InputObject
     }
 
-    $Output = [ordered]@{}
-    $InputObject.psobject.properties | Where-Object {$_.MemberType -eq 'NoteProperty'} | ForEach-Object {
+    $Output = [ordered]@{ }
+    $InputObject.psobject.properties | Where-Object { $_.MemberType -eq 'NoteProperty' } | ForEach-Object {
 
 
         if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
             $Output[$_.Name] = ConvertTo-HashTable -InputObject $_.Value
         }
         elseif ($_.Value -is [Array]) {
-            $Output[$_.Name] = @($_.Value | ForEach-Object {ConvertTo-HashTable -InputObject $_})
+            $Output[$_.Name] = @($_.Value | ForEach-Object { ConvertTo-HashTable -InputObject $_ })
         }
         else {
             $Output[$_.Name] = $_.Value
@@ -558,7 +558,7 @@ function Format-Json {
 
     $indent = 0;
     $result = ($json -Split '\n' |
-            ForEach-Object {
+        ForEach-Object {
             if ($_ -match '[\}\]]') {
                 # This line contains  ] or }, decrement the indentation level
                 $indent--
