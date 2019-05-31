@@ -357,7 +357,7 @@ Convert dictionary to ini expression string
 The Ordered Dictionary you wish to convert to a string.
 
 .OUTPUTS
-[string]
+[string[]]
 
 .EXAMPLE
 PS> $Dictionary = [ordered]@{ Section1 = @{ Key1 = 'Value1'; Key2 = 'Value2' } }
@@ -372,13 +372,27 @@ function ConvertTo-IniString {
     param
     (
         [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline)]
-        [System.Collections.Specialized.OrderedDictionary]
+        [ValidateScript( {
+                if (($_ -as [System.Collections.Specialized.OrderedDictionary]) -or ($_ -as [hashtable])) {
+                    $true
+                }
+                else {
+                    throw 'The value type of InputObject should be "System.Collections.Specialized.OrderedDictionary" or "System.Collections.Hashtable"'
+                }
+            })]
         $InputObject
     )
 
     Process {
         $IniString = New-Object 'System.Collections.Generic.List[System.String]'
-        if ($InputObject.Contains('_ROOT_')) {
+
+        $HasRootSection = if ($InputObject -as [System.Collections.Specialized.OrderedDictionary]) {
+            $InputObject.Contains('_ROOT_')
+        }
+        else {
+            $InputObject.ContainsKey('_ROOT_')
+        }
+        if ($HasRootSection) {
             if ($InputObject.'_ROOT_' -as [hashtable]) {
                 $private:Keys = $InputObject.'_ROOT_'
                 $Keys.Keys.ForEach( {
@@ -402,7 +416,6 @@ function ConvertTo-IniString {
         }
         $IniString.ToArray()
     }
-
 }
 
 
