@@ -377,30 +377,30 @@ function ConvertTo-IniString {
     )
 
     Process {
-        [string[]]$IniString = @()
+        $IniString = New-Object 'System.Collections.Generic.List[System.String]'
         if ($InputObject.Contains('_ROOT_')) {
             if ($InputObject.'_ROOT_' -as [hashtable]) {
                 $private:Keys = $InputObject.'_ROOT_'
                 $Keys.Keys.ForEach( {
-                        $IniString += ('{0}={1}' -f $_, $Keys.$_)
+                        $IniString.Add(('{0}={1}' -f $_, $Keys.$_))
                     })
-                $IniString += ''
+                $IniString.Add([string]::Empty)
             }
         }
 
         foreach ($Section in $InputObject.keys) {
             if (-not ($Section -eq '_ROOT_')) {
                 if ($InputObject.$Section -as [hashtable]) {
-                    $IniString += ('[{0}]' -f $Section)
+                    $IniString.Add(('[{0}]' -f $Section))
                     $private:Keys = $InputObject.$Section
                     $Keys.Keys.ForEach( {
-                            $IniString += ('{0}={1}' -f $_, $Keys.$_)
+                            $IniString.Add(('{0}={1}' -f $_, $Keys.$_))
                         })
-                    $IniString += ''
+                    $IniString.Add([string]::Empty)
                 }
             }
         }
-        $IniString
+        $IniString.ToArray()
     }
 
 }
