@@ -396,7 +396,7 @@ function ConvertTo-IniString {
         }
 
         if ($InputObject.Contains($RootKey)) {
-            if (Test-IsOrderedOrHash $InputObject.$RootKey) {
+            if ((Test-IsOrderedOrHash $InputObject.$RootKey) -and ($InputObject.$RootKey.Count -gt 0)) {
                 $private:Keys = $InputObject.$RootKey
                 $Keys.Keys.ForEach( {
                         $IniString.Add(('{0}={1}' -f $_, $Keys.$_))
