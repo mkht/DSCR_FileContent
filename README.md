@@ -246,6 +246,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 2.1.1
+ + [IniFile] Fixed an issue where extra blank lines might be inserted in the first line of ini file.
+
 ### 2.1.0
  + The functions `ConvertTo-IniString`, `Set-IniKey`, `Remove-IniKey` accept not only `[System.Collections.Specialized.OrderedDictionary]` but also `[hashtable]` input types.
  + [IniFile] Add a blank line to the beginning of sections.
