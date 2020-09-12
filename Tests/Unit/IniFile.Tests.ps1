@@ -20,6 +20,7 @@ Key1=Value1
 Key2=Value2
 Key3=
 
+; comments
 [SectionA]
 KeySA1=ValueSA1
 KeySA2=ValueSA2
