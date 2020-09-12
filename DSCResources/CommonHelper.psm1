@@ -91,7 +91,7 @@ function Get-NewContent {
         [Alias('LiteralPath', 'PSPath')]
         [string[]]$Path,
 
-        [Parameter(ValueFromPipelineByPropertyName)]
+        [Parameter()]
         [Encoding]$Encoding = 'default',
 
         [Parameter(ParameterSetName = 'Raw')]
@@ -103,11 +103,12 @@ function Get-NewContent {
 
         foreach ($item in $Path) {
             try {
+                $NativePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($item)
                 if ($PSCmdlet.ParameterSetName -eq 'Array') {
-                    [System.IO.File]::ReadAllLines($Path, $NativeEncoding)
+                    [System.IO.File]::ReadAllLines($NativePath, $NativeEncoding)
                 }
                 elseif ($PSCmdlet.ParameterSetName -eq 'Raw') {
-                    [System.IO.File]::ReadAllText($Path, $NativeEncoding)
+                    [System.IO.File]::ReadAllText($NativePath, $NativeEncoding)
                 }
             }
             catch {
@@ -119,15 +120,15 @@ function Get-NewContent {
 
 function Set-NewContent {
     param (
-        [Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 0)]
         [Alias('LiteralPath', 'PSPath')]
-        [string[]]$Path,
+        [string]$Path,
 
         [Parameter(Mandatory, Position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [AllowEmptyString()]
         [string]$Value,
 
-        [Parameter(ValueFromPipelineByPropertyName)]
+        [Parameter()]
         [Encoding]$Encoding = 'utf8',
 
         [Parameter()]
@@ -144,24 +145,45 @@ function Set-NewContent {
         [switch]$PassThru
     )
 
-    Process {
+    Begin {
         $NativeEncoding = Get-Encoding $Encoding
 
+        $setContentParams = @{
+            LiteralPath = $Path
+            Force       = $Force
+            PassThru    = $PassThru
+            NoNewLine   = $NoNewLine
+        }
+
         if ($PSVersionTable.PSVersion.Major -ge 6) {
-            $Value | Convert-NewLine -NewLine $NewLine |`
-                Set-Content -LiteralPath $Path -Value $Value -NoNewline:$NoNewLine -Force:$Force -PassThru:$PassThru -Encoding $NativeEncoding
+            $setContentParams.Add('Encoding', $NativeEncoding)
         }
         else {
             if ($Encoding -eq 'utf8BOM') {
-                $Value | Convert-NewLine -NewLine $NewLine |`
-                    Set-Content -LiteralPath $Path -Value $Value -NoNewline:$NoNewLine -Force:$Force -PassThru:$PassThru -Encoding utf8
+                $setContentParams.Add('Encoding', 'utf8')
             }
             else {
-                $Value | Convert-NewLine -NewLine $NewLine |`
-                    ForEach-Object { $NativeEncoding.GetBytes($_) } |`
-                    Set-Content -LiteralPath $Path -Value $Value -NoNewline:$NoNewLine -Force:$Force -PassThru:$PassThru -Encoding Byte
+                $setContentParams.Add('Encoding', 'Byte')
             }
         }
+
+        $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Set-Content', [System.Management.Automation.CommandTypes]::Cmdlet)
+        $scriptCmd = { & $wrappedCmd @setContentParams }
+        $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
+        $steppablePipeline.Begin($PSCmdlet)
+    }
+
+    Process {
+        if (($PSVersionTable.PSVersion.Major -ge 6) -or ($Encoding -eq 'utf8BOM')) {
+            $steppablePipeline.Process(($Value | Convert-NewLine -NewLine $NewLine))
+        }
+        else {
+            $steppablePipeline.Process(($Value | Convert-NewLine -NewLine $NewLine | ForEach-Object { $NativeEncoding.GetPreamble() + $NativeEncoding.GetBytes($_) }))
+        }
+    }
+
+    End {
+        $steppablePipeline.End()
     }
 }
 

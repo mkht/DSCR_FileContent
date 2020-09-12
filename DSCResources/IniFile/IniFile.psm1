@@ -162,7 +162,7 @@ function Set-TargetResource {
             $content = Get-IniFile -Path $Path -Encoding $Encoding | Remove-IniKey -Key $Key -Section $Section -PassThru | ConvertTo-IniString
 
             #Output Ini file
-            $content | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force
+            $content | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force
         }
     }
     else {
@@ -178,7 +178,7 @@ function Set-TargetResource {
         $content = $Ini | Set-IniKey -Key $Key -Value $Value -Section $Section -PassThru | ConvertTo-IniString
 
         #Output Ini file
-        $content | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force
+        $content | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force
     }
 } # end of Set-TargetResource
 

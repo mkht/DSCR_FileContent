@@ -94,7 +94,7 @@ function Set-TargetResource {
         else {
             #Output text file
             Write-Verbose ("Creating File '{0}'" -f $Path)
-            $Contents | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force -ErrorAction Stop
+            $Contents | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force -ErrorAction Stop
         }
     }
 } # end of Set-TargetResource

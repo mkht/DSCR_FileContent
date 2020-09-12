@@ -383,7 +383,7 @@ function Set-TargetResource {
     }
 
     # Save Json file
-    ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force -ErrorAction Stop
+    ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force -ErrorAction Stop
     Write-Verbose ('Json file "{0}" has been saved' -f $Path)
 }
 #endregion Set-TargetResource
