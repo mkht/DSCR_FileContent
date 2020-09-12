@@ -793,6 +793,28 @@ KeySA2=ValueSA2
 
                     (Get-TestEncoding -Path $path).BodyName | Should -Be 'utf-16BE'
                 }
+
+                It 'Create new INI file specified encoding (sjis)' {
+                    $path = (Join-Path $TestDrive 'sjis.ini')
+
+                    $getParam = @{
+                        Ensure   = 'Present'
+                        Path     = $path
+                        Section  = 'Section'
+                        Key      = 'Key'
+                        Value    = 'あいうえお'
+                        Encoding = 'sjis'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+
+                    Test-Path -LiteralPath $path | Should -Be $true
+                    $content = Get-Content -Path $path
+                    $content[0] | Should -Be '[Section]'
+                    $content[1] | Should -Be 'Key=あいうえお'
+
+                    (Get-TestEncoding -Path $path).BodyName | Should -Be 'iso-2022-jp'
+                }
             }
 
             Context 'NewLine Code' {

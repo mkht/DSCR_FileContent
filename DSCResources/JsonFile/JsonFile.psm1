@@ -34,7 +34,7 @@ function Get-TargetResource {
         $Mode = 'Value',
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         [string]
         $Encoding = 'utf8NoBOM',
 
@@ -83,8 +83,7 @@ function Get-TargetResource {
     else {
         # Read JSON
         $Json = try {
-            $PSEncoder = Get-PSEncoding -Encoding $Encoding
-            Get-Content -Path $Path -Raw -Encoding $PSEncoder | ConvertFrom-Json -ErrorAction Ignore
+            Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
         }
         catch { }
 
@@ -185,7 +184,7 @@ function Test-TargetResource {
         $Mode = 'Value',
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         [string]
         $Encoding = 'utf8NoBOM',
 
@@ -233,7 +232,7 @@ function Set-TargetResource {
         $Mode = 'Value',
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         [string]
         $Encoding = 'utf8NoBOM',
 
@@ -242,8 +241,6 @@ function Set-TargetResource {
         [string]
         $NewLine = 'CRLF'
     )
-
-    $PSEncoder = Get-PSEncoding -Encoding $Encoding
 
     $ValueObject = $null
     $tmp = try {
@@ -272,7 +269,7 @@ function Set-TargetResource {
     $JsonHash = $null
     if (Test-Path -Path $Path -PathType Leaf) {
         $JsonHash = try {
-            $Json = Get-Content -Path $Path -Raw -Encoding $PSEncoder | ConvertFrom-Json -ErrorAction Ignore
+            $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
             if ($Json) {
                 ConvertTo-HashTable -InputObject $Json
             }
@@ -386,15 +383,8 @@ function Set-TargetResource {
     }
 
     # Save Json file
-    if (('utf8', 'utf8NoBOM') -eq $Encoding) {
-        ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Convert-NewLine -NewLine $NewLine | ForEach-Object { [System.Text.Encoding]::UTF8.GetBytes($_) } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force -ErrorAction Stop
-        Write-Verbose ('Json file "{0}" has been saved' -f $Path)
-    }
-    else {
-        ConvertTo-Json -InputObject $JsonHash -Depth 100 | Convert-NewLine -NewLine $NewLine | Set-Content -Path $Path -Encoding $PSEncoder -NoNewline -Force -ErrorAction Stop
-        Write-Verbose ('The key "{0}" will be modified' -f $KeyHierarchy[$i])
-        Write-Verbose ('Json file "{0}" has been saved' -f $Path)
-    }
+    ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force -ErrorAction Stop
+    Write-Verbose ('Json file "{0}" has been saved' -f $Path)
 }
 #endregion Set-TargetResource
 

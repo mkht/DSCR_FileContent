@@ -76,42 +76,67 @@ Describe 'Tests for CommonHelper' {
             }
         }
 
-        Describe 'Get-PSEncoding' {
+        Describe 'Get-Encoding' {
 
-            It '"utf8" to "utf8"' {
-                Get-PSEncoding -Encoding "utf8" | Should -BeExactly "utf8"
+            It '"utf8" to utf8 without bom' {
+                $Enc = Get-Encoding -Encoding "utf8"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly "utf-8"
+                $Enc.GetPreamble() | Should -Be $null   #NoBOM
             }
 
-            It '"utf8NoBOM" to "utf8"' {
-                Get-PSEncoding -Encoding "utf8NoBOM" | Should -BeExactly "utf8"
+            It '"utf8NoBOM" to utf8 without bom' {
+                $Enc = Get-Encoding -Encoding "utf8NoBOM"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly "utf-8"
+                $Enc.GetPreamble() | Should -Be $null   #NoBOM
             }
 
-            It '"utf8BOM" to "utf8"' {
-                Get-PSEncoding -Encoding "utf8BOM" | Should -BeExactly "utf8"
+            It '"utf8BOM" to utf8 with bom' {
+                $Enc = Get-Encoding -Encoding "utf8BOM"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly "utf-8"
+                $Enc.GetPreamble() | Should -Be @(239, 187, 191)
             }
 
-            It '"Default" to "Default"' {
-                Get-PSEncoding -Encoding "Default" | Should -BeExactly "Default"
+            It '"Default" to Default' {
+                $Enc = Get-Encoding -Encoding "Default"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly ([System.Text.Encoding]::Default.BodyName)
             }
 
-            It '"utf32" to "utf32"' {
-                Get-PSEncoding -Encoding "utf32" | Should -BeExactly "utf32"
+            It '"utf32" to utf32' {
+                $Enc = Get-Encoding -Encoding "utf32"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly 'utf-32'
             }
 
-            It '"unicode" to "unicode"' {
-                Get-PSEncoding -Encoding "unicode" | Should -BeExactly "unicode"
+            It '"unicode" to unicode' {
+                $Enc = Get-Encoding -Encoding "unicode"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly 'utf-16'
             }
 
-            It '"bigendianunicode" to "bigendianunicode"' {
-                Get-PSEncoding -Encoding "bigendianunicode" | Should -BeExactly "bigendianunicode"
+            It '"bigendianunicode" to bigendianunicode' {
+                $Enc = Get-Encoding -Encoding "bigendianunicode"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly 'utf-16BE'
             }
 
-            It '"ascii" to "ascii"' {
-                Get-PSEncoding -Encoding "ascii" | Should -BeExactly "ascii"
+            It '"ascii" to ascii' {
+                $Enc = Get-Encoding -Encoding "ascii"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.BodyName | Should -BeExactly 'us-ascii'
             }
 
-            It 'Throws exception when the input is undefined string' {
-                {Get-PSEncoding -Encoding "foo"} | Should -Throw
+            It '"sjis" to "shift-jis"' {
+                $Enc = Get-Encoding -Encoding "sjis"
+                $Enc | Should -BeOfType [System.Text.Encoding]
+                $Enc.CodePage | Should -Be 932
+            }
+
+            It 'Throw exception if the input is undefined string' {
+                { Get-Encoding -Encoding "foo" } | Should -Throw
             }
         }
     }

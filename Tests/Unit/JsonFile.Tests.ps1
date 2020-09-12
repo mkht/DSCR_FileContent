@@ -352,6 +352,22 @@ Describe 'Tests for JsonFile' {
                     $result.Key | Should -Be $getParam.Key
                     $result.Value | Should -Be '"あいうえお"'
                 }
+
+                It 'Get exist Key Value Pair (sjis)' {
+                    $jsonPath = (Join-Path $TestData 'sjis_crlf.json')
+                    $getParam = @{
+                        Path     = $jsonPath
+                        Key      = 'test'
+                        Value    = '"あいうえお"'
+                        Encoding = 'sjis'
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Present'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    $result.Value | Should -Be '"あいうえお"'
+                }
             }
         }
         #endregion Tests for Get-TargetResource
@@ -934,6 +950,25 @@ Describe 'Tests for JsonFile' {
                     $result.test | Should -Be 'あいうえお'
 
                     (Get-TestEncoding -Path $jsonPath).BodyName | Should -Be 'utf-16BE'
+                }
+
+                It 'Create new Json file specified encoding (sjis)' {
+                    $jsonPath = (Join-Path $TestDrive 'sjis_crlf.Json')
+                    $getParam = @{
+                        Ensure   = 'Present'
+                        Path     = $jsonPath
+                        Key      = 'test'
+                        Value    = '"あいうえお"'
+                        Encoding = 'sjis'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+
+                    Test-Path -LiteralPath $jsonPath | Should -Be $true
+                    $result = Get-Content -Path $jsonPath -raw | ConvertFrom-Json
+                    $result.test | Should -Be 'あいうえお'
+
+                    (Get-TestEncoding -Path $jsonPath).BodyName | Should -Be 'iso-2022-jp'
                 }
             }
 

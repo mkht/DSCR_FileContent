@@ -22,6 +22,7 @@ Enum Encoding {
     unicode
     bigendianunicode
     ascii
+    sjis
 }
 
 
@@ -56,7 +57,7 @@ function Get-TargetResource {
 
         [Parameter()]
         [string]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         $Encoding = 'utf8NoBOM',
 
         [Parameter()]
@@ -142,7 +143,7 @@ function Set-TargetResource {
         $Section = '_ROOT_',
 
         [Parameter()]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         [string]
         $Encoding = 'utf8NoBOM',
 
@@ -151,8 +152,6 @@ function Set-TargetResource {
         [string]
         $NewLine = 'CRLF'
     )
-
-    $PSEncoder = Get-PSEncoding -Encoding $Encoding
 
     if (-not $Section) { $Section = '_ROOT_' }
 
@@ -163,12 +162,7 @@ function Set-TargetResource {
             $content = Get-IniFile -Path $Path -Encoding $Encoding | Remove-IniKey -Key $Key -Section $Section -PassThru | ConvertTo-IniString
 
             #Output Ini file
-            if (('utf8', 'utf8NoBOM') -eq $Encoding) {
-                $content | Out-String | Convert-NewLine -NewLine $NewLine | ForEach-Object { [System.Text.Encoding]::UTF8.GetBytes($_) } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force
-            }
-            else {
-                $content | Out-String | Convert-NewLine -NewLine $NewLine | Set-Content -Path $Path -Encoding $PSEncoder -NoNewline -Force
-            }
+            $content | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force
         }
     }
     else {
@@ -184,12 +178,7 @@ function Set-TargetResource {
         $content = $Ini | Set-IniKey -Key $Key -Value $Value -Section $Section -PassThru | ConvertTo-IniString
 
         #Output Ini file
-        if (('utf8', 'utf8NoBOM') -eq $Encoding) {
-            $content | Out-String | Convert-NewLine -NewLine $NewLine | ForEach-Object { [System.Text.Encoding]::UTF8.GetBytes($_) } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force
-        }
-        else {
-            $content | Out-String | Convert-NewLine -NewLine $NewLine | Set-Content -Path $Path -Encoding $PSEncoder -NoNewline -Force
-        }
+        $content | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force
     }
 } # end of Set-TargetResource
 
@@ -224,7 +213,7 @@ function Test-TargetResource {
         $Section = '_ROOT_',
 
         [Parameter()]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         [string]
         $Encoding = 'utf8NoBOM',
 
@@ -317,8 +306,7 @@ function Get-IniFile {
 
     process {
         # Write-Verbose ('Loading file from {0}' -f $Path)
-        $PSEncoder = Get-PSEncoding -Encoding $Encoding
-        $Content = Get-Content -Path $Path -Encoding $PSEncoder
+        $Content = Get-NewContent -Path $Path -Encoding $Encoding
         $CurrentSection = '_ROOT_'
         [OrderedDictionary]$IniHash = [ordered]@{ }
         $IniHash.Add($CurrentSection, [ordered]@{ })

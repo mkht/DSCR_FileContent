@@ -188,6 +188,20 @@ Describe 'Tests for TextFile' {
                         Test-TargetResource @testParam | Should -Be $true
                     }
 
+                    It 'Should return $true when the file exist, same size and same hash (sjis / CRLF)' {
+                        $TestDataPath = (Join-Path $TestData 'sjis_crlf.json')
+
+                        $testParam = @{
+                            Ensure   = 'Present'
+                            Path     = $TestDataPath
+                            Contents = $MockContent
+                            Encoding = 'sjis'
+                            NewLine  = 'CRLF'
+                        }
+
+                        Test-TargetResource @testParam | Should -Be $true
+                    }
+
                     It 'Should return $false when the file exist, but different size' {
                         $TestDataPath = (Join-Path $TestData 'utf8_crlf.json')
                         $TestContent = 'small'
@@ -370,6 +384,26 @@ Describe 'Tests for TextFile' {
                             Path     = $txtPath
                             Contents = $MockContent
                             Encoding = 'bigendianunicode'
+                            NewLine  = 'CRLF'
+                        }
+
+                        { Set-TargetResource @setParam } | Should -Not -Throw
+
+                        Test-Path -LiteralPath $txtPath | Should -Be $true
+                        (Get-FileHash $txtPath).Hash -eq (Get-FileHash $TestDataPath).Hash | Should -Be $true
+                    }
+
+                    It 'Create txt file (sjis / CRLF)' {
+                        $TestDataPath = (Join-Path $TestData 'sjis_crlf.json')
+
+                        $fileName = [System.Guid]::NewGuid().toString()
+                        $txtPath = (Join-Path $TestDrive $fileName)
+
+                        $setParam = @{
+                            Ensure   = 'Present'
+                            Path     = $txtPath
+                            Contents = $MockContent
+                            Encoding = 'sjis'
                             NewLine  = 'CRLF'
                         }
 

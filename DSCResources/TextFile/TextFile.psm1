@@ -33,7 +33,7 @@ function Get-TargetResource {
             Write-Warning ('The file size is over 2 KB, so reading is canceled.')
         }
         else {
-            $returnValue.Contents = (Get-Content -LiteralPath $Path -Raw)
+            $returnValue.Contents = (Get-NewContent -LiteralPath $Path -Raw)
         }
     }
 
@@ -60,7 +60,7 @@ function Set-TargetResource {
         $Contents = '',
 
         [Parameter()]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         [string]
         $Encoding = 'utf8NoBOM',
 
@@ -92,19 +92,9 @@ function Set-TargetResource {
             $null = New-Item -Path $Path -ItemType File -Force
         }
         else {
-            $Encoder = Get-Encoding -Encoding $Encoding -ErrorAction Stop
-
             #Output text file
             Write-Verbose ("Creating File '{0}'" -f $Path)
-            $Contents | Convert-NewLine -NewLine $NewLine | ForEach-Object {
-                if (($Encoding -eq 'utf8') -or ($Encoding -eq 'utf8NoBOM')) {
-                    $Encoder.GetBytes($_)
-                }
-                else {
-                    # Append BOM
-                    $Encoder.GetPreamble() + $Encoder.GetBytes($_)
-                }
-            } | Set-Content -Path $Path -Encoding Byte -NoNewline -Force -ErrorAction Stop
+            $Contents | Set-NewContent -Path $Path -Encoding $Encoding -NoNewline -Force -ErrorAction Stop
         }
     }
 } # end of Set-TargetResource
@@ -130,7 +120,7 @@ function Test-TargetResource {
         $Contents = '',
 
         [Parameter()]
-        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'Default')]
+        [ValidateSet('utf8', 'utf8NoBOM', 'utf8BOM', 'utf32', 'unicode', 'bigendianunicode', 'ascii', 'sjis', 'Default')]
         [string]
         $Encoding = 'utf8NoBOM',
 
@@ -201,75 +191,3 @@ function Test-TargetResource {
 
     return $true
 } # end of Test-TargetResource
-
-
-function Get-Encoding {
-    [CmdletBinding()]
-    [OutputType([System.Text.Encoding])]
-    Param
-    (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $Encoding
-    )
-
-    $ret = switch ($Encoding) {
-        'utf8' {
-            [System.Text.UTF8Encoding]::new($false)
-            break
-        }
-
-        'utf8NoBOM' {
-            [System.Text.UTF8Encoding]::new($false)
-            break
-        }
-
-        'utf8BOM' {
-            [System.Text.UTF8Encoding]::new($true)
-            break
-        }
-
-        'utf32' {
-            [System.Text.Encoding]::UTF32
-            break
-        }
-
-        'unicode' {
-            [System.Text.Encoding]::Unicode
-            break
-        }
-
-        'bigendianunicode' {
-            [System.Text.Encoding]::BigEndianUnicode
-            break
-        }
-
-        'ascii' {
-            [System.Text.Encoding]::ASCII
-            break
-        }
-
-        'Default' {
-            [System.Text.Encoding]::Default
-            break
-        }
-
-        Default {
-            try {
-                if ([int]::TryParse($Encoding, [ref]$null)) {
-                    [System.Text.Encoding]::GetEncoding([int]::Parse($Encoding))
-                }
-                else {
-                    [System.Text.Encoding]::GetEncoding($Encoding)
-                }
-            }
-            catch {
-                Write-Error -Exception $_.Exception
-                $null
-            }
-        }
-    }
-
-    $ret
-}

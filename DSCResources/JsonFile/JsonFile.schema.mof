@@ -7,6 +7,6 @@ class JsonFile : OMI_BaseResource
     [Key] String Key;
     [Key] String Value;
     [Write, ValueMap{"Value", "ArrayElement"}, Values{"Value", "ArrayElement"}] String Mode;
-    [Write, ValueMap{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "Default"}, Values{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "Default"}] String Encoding;
+    [Write, ValueMap{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "sjis", "Default"}, Values{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "sjis", "Default"}] String Encoding;
     [Write, ValueMap{"CRLF", "LF"}, Values{"CRLF", "LF"}] String NewLine;
 };
