@@ -29,7 +29,7 @@ PowerShell DSC Resource to create text file.
 
 + [string] **Encoding** (Write):
     + You can choose text encoding for the file.
-    + `UTF8NoBOM` (default) / `UTF8BOM` / `utf32` / `unicode` / `bigendianunicode` / `ascii`
+    + `UTF8NoBOM` (default) / `UTF8BOM` / `utf32` / `unicode` / `bigendianunicode` / `ascii` / `sjis`
 
 + [string] **NewLine** (Write):
     + You can choose new line code for the file.
@@ -75,7 +75,7 @@ PowerShell DSC Resource to create ini file.
 
 + [string] **Encoding** (Write):
     + You can choose text encoding for the INI file.
-    + `UTF8NoBOM` (default) / `UTF8BOM` / `utf32` / `unicode` / `bigendianunicode` / `ascii`
+    + `UTF8NoBOM` (default) / `UTF8BOM` / `utf32` / `unicode` / `bigendianunicode` / `ascii` / `sjis`
 
 + [string] **NewLine** (Write):
     + You can choose new line code for the INI file.
@@ -138,7 +138,7 @@ PowerShell DSC Resource to create JSON file.
 
 + [string] **Encoding** (Write):
     + You can choose text encoding for the JSON file.
-    + utf8NoBOM (default) / utf8BOM / utf32 / unicode / bigendianunicode / ascii
+    + `UTF8NoBOM` (default) / `UTF8BOM` / `utf32` / `unicode` / `bigendianunicode` / `ascii` / `sjis`
 
 + [string] **NewLine** (Write):
     + You can choose new line code for the JSON file.
@@ -188,7 +188,7 @@ Load ini file and convert to the dictionary object
 
 + **Syntax**
 ```PowerShell
-Get-IniFile [-Path] <string> [-Encoding { <utf8> | <utf8BOM> | <utf32> | <unicode> | <bigendianunicode> | <ascii> | <Default> }]
+Get-IniFile [-Path] <string> [-Encoding { <utf8> | <utf8BOM> | <utf32> | <unicode> | <bigendianunicode> | <ascii> | <sjis> | <Default> }]
 ```
 
 
@@ -246,6 +246,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### Unreleased
++ Add `sjis` (Japanese Shift_JIS) encoding support.
+
 ### 2.1.1
  + [IniFile] Fixed an issue where extra blank lines might be inserted in the first line of ini file.
 
