@@ -30,7 +30,7 @@ Describe 'Tests for TextFile' {
 
                 It 'Return Present with content when the size of content is smaller than 2048 bytes' {
                     $MockContent1 = 'some text'
-                    $MockContent1 | Out-File -FilePath (Join-Path $TestDrive $ExistMock) -Encoding utf8 -Force -NoNewline
+                    $MockContent1 | Out-File -FilePath (Join-Path $TestDrive $ExistMock) -Encoding ascii -Force -NoNewline
 
                     $textPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
@@ -44,8 +44,8 @@ Describe 'Tests for TextFile' {
                 }
 
                 It 'Return Present with content when the size of content is equal 2048 bytes' {
-                    $MockContent2 = ((1..2045) | ForEach-Object {[char]54}) -join ''
-                    $MockContent2 | Out-File -FilePath (Join-Path $TestDrive $ExistMock) -Encoding utf8 -Force -NoNewline
+                    $MockContent2 = ((1..2048) | ForEach-Object { [char]54 }) -join ''
+                    $MockContent2 | Out-File -FilePath (Join-Path $TestDrive $ExistMock) -Encoding ascii -Force -NoNewline
 
                     $textPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
@@ -59,8 +59,8 @@ Describe 'Tests for TextFile' {
                 }
 
                 It 'Return Present without content when the size of content is bigger than 2048 bytes' {
-                    $MockContent3 = ((1..2046) | ForEach-Object {[char]54}) -join ''
-                    $MockContent3 | Out-File -FilePath (Join-Path $TestDrive $ExistMock) -Encoding utf8 -Force -NoNewline
+                    $MockContent3 = ((1..2049) | ForEach-Object { [char]54 }) -join ''
+                    $MockContent3 | Out-File -FilePath (Join-Path $TestDrive $ExistMock) -Encoding ascii -Force -NoNewline
 
                     $textPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
@@ -217,7 +217,7 @@ Describe 'Tests for TextFile' {
 
                     It 'Should return $false when the file exist, same size, but different hash' {
                         $TestDataPath = (Join-Path $TestData 'utf8_crlf.json')  #35 bytes
-                        $TestContent = ((1..35) | ForEach-Object {[char]54}) -join '' #35 bytes
+                        $TestContent = ((1..35) | ForEach-Object { [char]54 }) -join '' #35 bytes
 
                         $testParam = @{
                             Ensure   = 'Present'

@@ -809,7 +809,7 @@ KeySA2=ValueSA2
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     Test-Path -LiteralPath $path | Should -Be $true
-                    $content = Get-Content -Path $path
+                    $content = [System.IO.File]::ReadAllLines($path, [Text.Encoding]::GetEncoding(932))
                     $content[0] | Should -Be '[Section]'
                     $content[1] | Should -Be 'Key=あいうえお'
 

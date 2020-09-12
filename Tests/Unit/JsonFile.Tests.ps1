@@ -192,7 +192,7 @@ Describe 'Tests for JsonFile' {
                     $getParam = @{
                         Path  = $jsonPath
                         Key   = 'Dictionary'
-                        Value = (@{DicKey1 = "DicValue1"; DicKey2 = "DicValue2"} | ConvertTo-Json)
+                        Value = (@{DicKey1 = "DicValue1"; DicKey2 = "DicValue2" } | ConvertTo-Json)
                     }
 
                     $result = Get-TargetResource @getParam
@@ -207,7 +207,7 @@ Describe 'Tests for JsonFile' {
                     $getParam = @{
                         Path  = $jsonPath
                         Key   = 'SubDictionary/SubDicKey1'
-                        Value = (@{SubSubKey1 = "SubSubValue1"; SubSubKey2 = "SubSubValue2"} | ConvertTo-Json)
+                        Value = (@{SubSubKey1 = "SubSubValue1"; SubSubKey2 = "SubSubValue2" } | ConvertTo-Json)
                     }
 
                     $result = Get-TargetResource @getParam
@@ -572,7 +572,14 @@ Describe 'Tests for JsonFile' {
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
-                    $result.IntZ | Should -BeOfType [int]
+                    if ($PSVersionTable.PSVersion.Major -ge 6) {
+                        #PS6+ resolves JSON number as [long]
+                        $result.IntZ | Should -BeOfType [long]
+                    }
+                    else {
+                        #PS5 resolves JSON number as [int]
+                        $result.IntZ | Should -BeOfType [int]
+                    }
                     $result.IntZ | Should -Be 56789
                 }
 
@@ -673,7 +680,7 @@ Describe 'Tests for JsonFile' {
                         Ensure = 'Present'
                         Path   = $jsonPath
                         Key    = 'DicZ'
-                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC'} | ConvertTo-Json)
+                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC' } | ConvertTo-Json)
                     }
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
@@ -689,7 +696,7 @@ Describe 'Tests for JsonFile' {
                         Ensure = 'Present'
                         Path   = $jsonPath
                         Key    = 'DicZ/DicY'
-                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC'} | ConvertTo-Json)
+                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC' } | ConvertTo-Json)
                     }
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
@@ -763,7 +770,7 @@ Describe 'Tests for JsonFile' {
                         Ensure = 'Present'
                         Path   = $jsonPath
                         Key    = 'SubDictionary/SubDicKey1'
-                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC'} | ConvertTo-Json)
+                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC' } | ConvertTo-Json)
                     }
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
@@ -835,7 +842,7 @@ Describe 'Tests for JsonFile' {
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
-                    $result | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -eq 'String'} | Should -Be $null
+                    $result | Get-Member -MemberType NoteProperty | Where-Object { $_.Name -eq 'String' } | Should -Be $null
                 }
 
                 It 'Remove Key in JSON  (SubDictionary)' {
@@ -849,7 +856,7 @@ Describe 'Tests for JsonFile' {
 
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
-                    $result.SubDictionary | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -eq 'SubDicKey2'} | Should -Be $null
+                    $result.SubDictionary | Get-Member -MemberType NoteProperty | Where-Object { $_.Name -eq 'SubDicKey2' } | Should -Be $null
                 }
 
                 It 'Remove array element in JSON  (Mode = "ArrayElement")' {
@@ -965,7 +972,7 @@ Describe 'Tests for JsonFile' {
                     { Set-TargetResource @getParam } | Should -Not -Throw
 
                     Test-Path -LiteralPath $jsonPath | Should -Be $true
-                    $result = Get-Content -Path $jsonPath -raw | ConvertFrom-Json
+                    $result = ([System.IO.File]::ReadAllText($jsonPath, [Text.Encoding]::GetEncoding(932))) | ConvertFrom-Json
                     $result.test | Should -Be 'あいうえお'
 
                     (Get-TestEncoding -Path $jsonPath).BodyName | Should -Be 'iso-2022-jp'

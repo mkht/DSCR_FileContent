@@ -108,7 +108,15 @@ function Get-TargetResource {
 
                 if ($i -gt ($KeyHierarchy.Count - 2)) {
                     $Result.Key = $Key
-                    $Result.Value = ConvertTo-Json -InputObject $tHash.$tKey -Compress
+
+                    # To avoid the effects of the changes in PS7.
+                    # https://github.com/PowerShell/PowerShell/issues/10942
+                    if ($null -eq $tHash.$tKey) {
+                        $Result.Value = $null
+                    }
+                    else {
+                        $Result.Value = ConvertTo-Json -InputObject $tHash.$tKey -Compress
+                    }
 
                     switch ($Mode) {
                         'Value' {

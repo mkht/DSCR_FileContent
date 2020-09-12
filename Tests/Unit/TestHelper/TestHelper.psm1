@@ -3,8 +3,9 @@ function Test-BOM {
         $Path
     )
 
-    [Byte[]]$bytes = gc -LiteralPath $Path -Encoding Byte | select -First 3
-    [string]$bom = ($bytes | % {$_.ToString()}) -join ';'
+    $NativePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+    [Byte[]]$bytes = ([System.IO.File]::ReadAllBytes($NativePath)) | select -First 3
+    [string]$bom = ($bytes | % { $_.ToString() }) -join ';'
     switch ($bom) {
         '239;187;191' {
             'utf8BOM'
