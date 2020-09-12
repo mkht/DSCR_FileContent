@@ -246,8 +246,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
-### Unreleased
+### 2.2.0
 + Add `sjis` (Japanese Shift_JIS) encoding support.
++ Improve compatibility with PowerShell 7. (Since this version, supports PS7)
 
 ### 2.1.1
  + [IniFile] Fixed an issue where extra blank lines might be inserted in the first line of ini file.
