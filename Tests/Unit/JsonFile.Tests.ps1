@@ -38,6 +38,13 @@ Describe 'Tests for JsonFile' {
                 "SubSubKey2": "SubSubValue2"
             },
             "SubDicKey2": true
+        },
+        "Escape/Dictionary": {
+            "Sub\\/\\/Esc/Key\\1": {
+                "Sub/Sub\\Key1": "SubSubValue1",
+                "Sub//SubKey2": "SubSubValue2"
+            },
+            "Sub/EscKey2": true
         }
     }
 '@
@@ -217,6 +224,21 @@ Describe 'Tests for JsonFile' {
                     $result.Value | Should -Be '{"SubSubKey1":"SubSubValue1","SubSubKey2":"SubSubValue2"}'
                 }
 
+                It 'Get exist Key Value Pair (SubDictionary, Include escape)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'Escape\/Dictionary/Sub\\/\\/Esc\/Key\1'
+                        Value = (@{'Sub/Sub\Key1' = "SubSubValue1"; 'Sub//SubKey2' = "SubSubValue2" } | ConvertTo-Json)
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Present'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    $result.Value | Should -Be '{"Sub/Sub\\Key1":"SubSubValue1","Sub//SubKey2":"SubSubValue2"}'
+                }
+
                 It 'Get exist Key Value Pair (Mode = "ArrayElement")' {
                     $jsonPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
@@ -280,6 +302,21 @@ Describe 'Tests for JsonFile' {
                     $getParam = @{
                         Path  = $jsonPath
                         Key   = 'SubDictionary/SubDicKey2'
+                        Value = '"not match"'
+                    }
+
+                    $result = Get-TargetResource @getParam
+                    $result.Ensure | Should -Be 'Absent'
+                    $result.Path | Should -Be $getParam.Path
+                    $result.Key | Should -Be $getParam.Key
+                    $result.Value | Should -Be 'true'
+                }
+
+                It 'Should return Absent when the key value was not matched (SubDictionary, Include escape)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Path  = $jsonPath
+                        Key   = 'Escape\/Dictionary/Sub\/EscKey2'
                         Value = '"not match"'
                     }
 
@@ -706,6 +743,22 @@ Describe 'Tests for JsonFile' {
                     $result.DicZ.DicY.k3 | Should -Be "ABC"
                 }
 
+                It 'Add Key Value Pair to Json when the key not exist (SubDictionary, Include escaping)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'Esc\/Z/Esc:\/\/\Y'
+                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC' } | ConvertTo-Json)
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.'Esc/Z'.'Esc://\Y'.k1 | Should -Be $true
+                    $result.'Esc/Z'.'Esc://\Y'.k2 | Should -Be 345
+                    $result.'Esc/Z'.'Esc://\Y'.k3 | Should -Be "ABC"
+                }
+
                 It 'Add Array element to Json when the key not exist (Mode = "ArrayElement")' {
                     $jsonPath = (Join-Path $TestDrive $ExistMock)
                     $getParam = @{
@@ -778,6 +831,22 @@ Describe 'Tests for JsonFile' {
                     $result.SubDictionary.SubDicKey1.k1 | Should -Be $true
                     $result.SubDictionary.SubDicKey1.k2 | Should -Be 345
                     $result.SubDictionary.SubDicKey1.k3 | Should -Be "ABC"
+                }
+
+                It 'Modify exist Key Value Pair (SubDictionary, Include escape)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Present'
+                        Path   = $jsonPath
+                        Key    = 'Escape\/Dictionary/Sub\\/\\/Esc\/Key\1'
+                        Value  = (@{k1 = $true; k2 = 345; k3 = 'ABC' } | ConvertTo-Json)
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.'Escape/Dictionary'.'Sub\/\/Esc/Key\1'.k1 | Should -Be $true
+                    $result.'Escape/Dictionary'.'Sub\/\/Esc/Key\1'.k2 | Should -Be 345
+                    $result.'Escape/Dictionary'.'Sub\/\/Esc/Key\1'.k3 | Should -Be "ABC"
                 }
 
                 It 'Modify exist Key Value Pair (SubDictionary, When the parent key has value that the type is not hashtable)' {
@@ -857,6 +926,20 @@ Describe 'Tests for JsonFile' {
                     { Set-TargetResource @getParam } | Should -Not -Throw
                     $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
                     $result.SubDictionary | Get-Member -MemberType NoteProperty | Where-Object { $_.Name -eq 'SubDicKey2' } | Should -Be $null
+                }
+
+                It 'Remove Key in JSON  (SubDictionary, Include escape)' {
+                    $jsonPath = (Join-Path $TestDrive $ExistMock)
+                    $getParam = @{
+                        Ensure = 'Absent'
+                        Path   = $jsonPath
+                        Key    = 'Escape\/Dictionary/Sub\/EscKey2'
+                        Value  = 'foo'
+                    }
+
+                    { Set-TargetResource @getParam } | Should -Not -Throw
+                    $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+                    $result.'Escape/Dictionary' | Get-Member -MemberType NoteProperty | Where-Object { $_.Name -eq 'SubDicKey2' } | Should -Be $null
                 }
 
                 It 'Remove array element in JSON  (Mode = "ArrayElement")' {

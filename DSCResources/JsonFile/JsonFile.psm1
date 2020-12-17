@@ -95,7 +95,7 @@ function Get-TargetResource {
         else {
             $JsonHash = ConvertTo-HashTable -InputObject $Json
 
-            $KeyHierarchy = $Key -split '/'
+            $KeyHierarchy = $Key -split '(?<!\\)/' -replace '\\/', '/'
             $tHash = $JsonHash
             for ($i = 0; $i -lt $KeyHierarchy.Count; $i++) {
                 $local:tKey = $KeyHierarchy[$i]
@@ -288,11 +288,11 @@ function Set-TargetResource {
     # Ensure = "Absent"
     if ($Ensure -eq 'Absent') {
         if ($JsonHash) {
-            $KeyHierarchy = $Key -split '/'
+            $KeyHierarchy = $Key -split '(?<!\\)/' -replace '\\/', '/'
             $expression = '$JsonHash'
             for ($i = 0; $i -lt $KeyHierarchy.Count; $i++) {
                 if ($i -ne ($KeyHierarchy.Count - 1)) {
-                    $expression += ('.{0}' -f $KeyHierarchy[$i])
+                    $expression += (".'{0}'" -f $KeyHierarchy[$i])
                 }
                 else {
                     if (Invoke-Expression -Command $expression) {
@@ -302,7 +302,7 @@ function Set-TargetResource {
                                 $expression += (".Remove('{0}')" -f $KeyHierarchy[$i])
                             }
                             'ArrayElement' {
-                                $tmpex = $expression + (".{0}" -f $KeyHierarchy[$i])
+                                $tmpex = $expression + (".'{0}'" -f $KeyHierarchy[$i])
                                 $v = Invoke-Expression -Command $tmpex
                                 if ($v -is [Array]) {
                                     $script:newValue = $v | Where-Object { -not (Compare-MyObject $_ $ValueObject) }
@@ -312,7 +312,7 @@ function Set-TargetResource {
                                     }
                                     else {
                                         Write-Verbose ('The key "{0}" will be modified' -f $KeyHierarchy[$i])
-                                        $expression += ('.{0} = @($script:newValue)' -f $KeyHierarchy[$i])
+                                        $expression += ('."{0}" = @($script:newValue)' -f $KeyHierarchy[$i])
                                     }
                                 }
                                 else {
@@ -340,7 +340,7 @@ function Set-TargetResource {
             $ValueObject = $ValueObject.SyncRoot
         }
 
-        $KeyHierarchy = $Key -split '/'
+        $KeyHierarchy = $Key -split '(?<!\\)/' -replace '\\/', '/'
         $tHash = $JsonHash
         for ($i = 0; $i -lt $KeyHierarchy.Count; $i++) {
             if ($i -lt ($KeyHierarchy.Count - 1)) {
