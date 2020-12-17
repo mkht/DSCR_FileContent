@@ -131,6 +131,7 @@ PowerShell DSC Resource to create JSON file.
 
 + [string] **Key** (Key):
     + Key element.
+    + A slash delimiter can be used to specify a dictionary subkey. (See Example2)
 
 + [string] **Value** (Key):
     + The value corresponding to the key.
@@ -177,6 +178,46 @@ The result of executing the above configuration, the following JSON file will ou
     123,
     "banana"
   ]
+}
+```
+
++ **Example 2**
+```Powershell
+Configuration Example2 {
+    Import-DscResource -ModuleName DSCR_FileContent
+    JsonFile Dictionary {
+        Path = 'C:\Test2.json'
+        Key = 'KeyA'
+        Value = '{"Ame":false,"Gura":true}'
+    }
+    JsonFile SubDictionary {
+        Path = 'C:\Test2.json'
+        Key = 'KeyB/SubKeyB'
+        Value = 'Ina'
+    }
+    #If the key name contains a slash, please escape it with a backslash
+    JsonFile SubDictionaryWithSlash {
+        Path = 'C:\Test2.json'
+        Key = 'KeyB/Sub\/\/Key'
+        Value = 'Kiara'
+    }
+}
+```
+
+The result of executing the above configuration, the following JSON file will output to `C:\Test2.json`
+```json
+{
+  "KeyA": {
+    "Ame": false,
+    "Gura": true
+  },
+  "KeyB": {
+    "SubKeyB": {
+      "Ina": true,
+      "Calli": true
+    },
+    "Sub//Key": "Kiara"
+  }
 }
 ```
 
@@ -246,6 +287,10 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 2.3.0
++ [JsonFile] Subkeys of dictionary can now be specified as keys using slash delimiter.
++ [JsonFile] Fix some security issues.
+
 ### 2.2.0
 + Add `sjis` (Japanese Shift_JIS) encoding support.
 + Improve compatibility with PowerShell 7. (Since this version, supports PS7)
