@@ -148,6 +148,17 @@ function Set-NewContent {
     Begin {
         $NativeEncoding = Get-Encoding $Encoding
 
+        if ($NoNewLine) {
+            $LineFeed = $null
+        }
+        else {
+            $LineFeed = switch -Exact ($NewLine) {
+                'CRLF' { $NativeEncoding.GetBytes("`r`n") ; break }
+                'LF' { $NativeEncoding.GetBytes("`n") ; break }
+                Default { $null }
+            }
+        }
+
         $setContentParams = @{
             LiteralPath = $Path
             Force       = $Force
@@ -178,7 +189,7 @@ function Set-NewContent {
             $steppablePipeline.Process(($Value | Convert-NewLine -NewLine $NewLine))
         }
         else {
-            $steppablePipeline.Process(($Value | Convert-NewLine -NewLine $NewLine | ForEach-Object { $NativeEncoding.GetPreamble() + $NativeEncoding.GetBytes($_) }))
+            $steppablePipeline.Process(($Value | Convert-NewLine -NewLine $NewLine | ForEach-Object { $NativeEncoding.GetPreamble() + $NativeEncoding.GetBytes($_) + $LineFeed }))
         }
     }
 
