@@ -287,6 +287,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 2.4.2
++ Fixed an issue that line feeds may not be added correctly when an array of strings is input to `Set-NewContent` from the pipeline.
+
 ### 2.4.1
 + Export new functions `Convert-NewLine` & `Set-NewContent`
 
