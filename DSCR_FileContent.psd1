@@ -3,7 +3,7 @@
     RootModule           = 'DSCR_FileContent.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.4.0'
+    ModuleVersion        = '2.4.1'
 
     # ID used to uniquely identify this module
     GUID                 = '8e9d0992-d96a-4489-8077-a04b1a560c4c'
