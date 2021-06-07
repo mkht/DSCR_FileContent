@@ -287,6 +287,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 2.4.0
++ Export new functions `Convert-NewLine` & `Set-NewContent`
+
 ### 2.3.0
 + [JsonFile] Subkeys of dictionary can now be specified as keys using slash delimiter.
 + [JsonFile] Fix some security issues.

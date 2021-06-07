@@ -3,7 +3,7 @@
     RootModule           = 'DSCR_FileContent.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.3.0'
+    ModuleVersion        = '2.4.0'
 
     # ID used to uniquely identify this module
     GUID                 = '8e9d0992-d96a-4489-8077-a04b1a560c4c'
@@ -15,7 +15,7 @@
     CompanyName          = ''
 
     # Description of the functionality provided by this module
-    Copyright            = '(c) 2020 mkht. All rights reserved.'
+    Copyright            = '(c) 2021 mkht. All rights reserved.'
 
     # Copyright statement for this module
     Description          = 'PowerShell DSC Resource to create TXT / INI / JSON file.'
@@ -31,7 +31,9 @@
         'Get-IniFile',
         'ConvertTo-IniString',
         'Set-IniKey',
-        'Remove-IniKey'
+        'Remove-IniKey',
+        'Convert-NewLine',
+        'Set-NewContent'
     )
 
     # Cmdlets to export from this module
