@@ -2,8 +2,10 @@
 
     RootModule           = 'DSCR_FileContent.psm1'
 
+    RequiredModules      = @('PSAdvancedJsonCmdlet')
+
     # Version number of this module.
-    ModuleVersion        = '2.4.2'
+    ModuleVersion        = '3.0.0-beta.1'
 
     # ID used to uniquely identify this module
     GUID                 = '8e9d0992-d96a-4489-8077-a04b1a560c4c'
@@ -21,7 +23,7 @@
     Description          = 'PowerShell DSC Resource to create TXT / INI / JSON file.'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion    = '5.0'
+    PowerShellVersion    = '5.1'
 
     # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
     # CLRVersion = ''

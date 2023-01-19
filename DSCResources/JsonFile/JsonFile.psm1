@@ -41,7 +41,11 @@ function Get-TargetResource {
         [Parameter(Mandatory = $false)]
         [ValidateSet('CRLF', 'LF')]
         [string]
-        $NewLine = 'CRLF'
+        $NewLine = 'CRLF',
+
+        [Parameter(Mandatory = $false)]
+        [bool]
+        $UseNewtonsoftJson = $false
     )
 
     $Result = @{
@@ -199,7 +203,11 @@ function Test-TargetResource {
         [Parameter(Mandatory = $false)]
         [ValidateSet('CRLF', 'LF')]
         [string]
-        $NewLine = 'CRLF'
+        $NewLine = 'CRLF',
+
+        [Parameter(Mandatory = $false)]
+        [bool]
+        $UseNewtonsoftJson = $false
     )
 
     [bool]$result = (Get-TargetResource @PSBoundParameters).Ensure -eq $Ensure
@@ -247,12 +255,21 @@ function Set-TargetResource {
         [Parameter(Mandatory = $false)]
         [ValidateSet('CRLF', 'LF')]
         [string]
-        $NewLine = 'CRLF'
+        $NewLine = 'CRLF',
+
+        [Parameter(Mandatory = $false)]
+        [bool]
+        $UseNewtonsoftJson = $false
     )
 
     $ValueObject = $null
     $tmp = try {
-        ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+        if (-not $UseNewtonsoftJson) {
+            ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+        }
+        else {
+            ConvertFrom-AdvancedJson -InputObject $Value -ErrorAction Ignore
+        }
     }
     catch { }
 
@@ -277,7 +294,13 @@ function Set-TargetResource {
     $JsonHash = $null
     if (Test-Path -Path $Path -PathType Leaf) {
         $JsonHash = try {
-            $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
+            if (-not $UseNewtonsoftJson) {
+                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
+            }
+            else {
+                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -ErrorAction Ignore
+            }
+
             if ($Json) {
                 ConvertTo-HashTable -InputObject $Json
             }
@@ -391,7 +414,12 @@ function Set-TargetResource {
     }
 
     # Save Json file
-    ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force -ErrorAction Stop
+    if (-not $UseNewtonsoftJson) {
+        ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force -ErrorAction Stop
+    }
+    else {
+        ConvertTo-AdvancedJson -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force -ErrorAction Stop
+    }
     Write-Verbose ('Json file "{0}" has been saved' -f $Path)
 }
 #endregion Set-TargetResource
