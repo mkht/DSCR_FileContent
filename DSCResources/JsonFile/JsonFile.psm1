@@ -57,7 +57,12 @@ function Get-TargetResource {
 
     $ValueObject = $null
     $tmp = try {
-        ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+        if (-not $UseNewtonsoftJson) {
+            ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+        }
+        else {
+            ConvertFrom-AdvancedJson -InputObject $Value -ErrorAction Ignore
+        }
     }
     catch { }
 
@@ -87,7 +92,12 @@ function Get-TargetResource {
     else {
         # Read JSON
         $Json = try {
-            Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
+            if (-not $UseNewtonsoftJson) {
+                Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
+            }
+            else {
+                Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -ErrorAction Ignore
+            }
         }
         catch { }
 
@@ -119,7 +129,12 @@ function Get-TargetResource {
                         $Result.Value = $null
                     }
                     else {
-                        $Result.Value = ConvertTo-Json -InputObject $tHash.$tKey -Compress
+                        if (-not $UseNewtonsoftJson) {
+                            $Result.Value = ConvertTo-Json -InputObject $tHash.$tKey -Compress
+                        }
+                        else {
+                            $Result.Value = ConvertTo-AdvancedJson -InputObject $tHash.$tKey -Compress
+                        }
                     }
 
                     switch ($Mode) {
