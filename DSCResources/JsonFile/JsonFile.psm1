@@ -45,8 +45,13 @@ function Get-TargetResource {
 
         [Parameter(Mandatory = $false)]
         [bool]
-        $UseNewtonsoftJson = $false
+        $UseLegacy = $false
     )
+
+    if ($UseLegacy -and $PSVersionTable.PSVersion.Major -ge 6) {
+        Write-Warning ('UseLegacy is only for PowerShell 5. Will ignore it on PowerShell {0}.{1}' -f $PSVersionTable.PSVersion.Major, $PSVersionTable.PSVersion.Minor)
+        $UseLegacy = $false
+    }
 
     $Result = @{
         Ensure = 'Present'
@@ -57,7 +62,7 @@ function Get-TargetResource {
 
     $ValueObject = $null
     $tmp = try {
-        if (-not $UseNewtonsoftJson) {
+        if ($UseLegacy) {
             ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
         }
         else {
@@ -92,7 +97,7 @@ function Get-TargetResource {
     else {
         # Read JSON
         $Json = try {
-            if (-not $UseNewtonsoftJson) {
+            if ($UseLegacy) {
                 Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
             }
             else {
@@ -129,7 +134,7 @@ function Get-TargetResource {
                         $Result.Value = $null
                     }
                     else {
-                        if (-not $UseNewtonsoftJson) {
+                        if ($UseLegacy) {
                             $Result.Value = ConvertTo-Json -InputObject $tHash.$tKey -Compress
                         }
                         else {
@@ -222,7 +227,7 @@ function Test-TargetResource {
 
         [Parameter(Mandatory = $false)]
         [bool]
-        $UseNewtonsoftJson = $false
+        $UseLegacy = $false
     )
 
     [bool]$result = (Get-TargetResource @PSBoundParameters).Ensure -eq $Ensure
@@ -274,12 +279,17 @@ function Set-TargetResource {
 
         [Parameter(Mandatory = $false)]
         [bool]
-        $UseNewtonsoftJson = $false
+        $UseLegacy = $false
     )
+
+    if ($UseLegacy -and $PSVersionTable.PSVersion.Major -ge 6) {
+        Write-Warning ('UseLegacy is only for PowerShell 5. Will ignore it on PowerShell {0}.{1}' -f $PSVersionTable.PSVersion.Major, $PSVersionTable.PSVersion.Minor)
+        $UseLegacy = $false
+    }
 
     $ValueObject = $null
     $tmp = try {
-        if (-not $UseNewtonsoftJson) {
+        if ($UseLegacy) {
             ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
         }
         else {
@@ -309,7 +319,7 @@ function Set-TargetResource {
     $JsonHash = $null
     if (Test-Path -Path $Path -PathType Leaf) {
         $JsonHash = try {
-            if (-not $UseNewtonsoftJson) {
+            if ($UseLegacy) {
                 $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
             }
             else {
@@ -429,7 +439,7 @@ function Set-TargetResource {
     }
 
     # Save Json file
-    if (-not $UseNewtonsoftJson) {
+    if ($UseLegacy) {
         ConvertTo-Json -InputObject $JsonHash -Depth 100 | Format-Json | Out-String | Set-NewContent -Path $Path -Encoding $Encoding -NewLine $NewLine -NoNewline -Force -ErrorAction Stop
     }
     else {

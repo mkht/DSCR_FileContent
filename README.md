@@ -145,6 +145,11 @@ PowerShell DSC Resource to create JSON file.
     + You can choose new line code for the JSON file.
     + CRLF (default) / LF
 
++ [bool] **UseLegacy** (Write):
+    + From `3.0.0`, This module uses Newtonsoft.Json based JSON serializer provided by [PSAdvancedJsonCmdlet]() instead of PowerShell built-in cmdlets.
+    + If `UseLegacy` specifies as `$true`, It will use built-in cmdlets.
+    + Default value is `$false`.
+
 ### Examples
 + **Example 1**
 ```Powershell

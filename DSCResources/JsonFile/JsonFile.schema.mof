@@ -9,5 +9,5 @@ class JsonFile : OMI_BaseResource
     [Write, ValueMap{"Value", "ArrayElement"}, Values{"Value", "ArrayElement"}] String Mode;
     [Write, ValueMap{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "sjis", "Default"}, Values{"utf8", "utf8NoBOM", "utf8BOM", "utf32", "unicode", "bigendianunicode", "ascii", "sjis", "Default"}] String Encoding;
     [Write, ValueMap{"CRLF", "LF"}, Values{"CRLF", "LF"}] String NewLine;
-    [write] boolean UseNewtonsoftJson;
+    [write] boolean UseLegacy;
 };
