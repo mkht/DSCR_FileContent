@@ -7,7 +7,14 @@ PowerShell DSC Resource to create TEXT / INI / JSON files.
 ## Install
 You can install resource from [PowerShell Gallery](https://www.powershellgallery.com/packages/DSCR_FileContent/).
 ```Powershell
-Install-Module -Name DSCR_FileContent
+Install-Module -Name DSCR_FileContent -Scope AllUsers
+```
+
+### Dependencies
+Also, this module depends with [PSAdvancedJsonCmdlet](https://www.powershellgallery.com/packages/PSAdvancedJsonCmdlet/) module.  
+It will be installed through PowerShell Gallery automatically, but you can also install explicitly.
+```Powershell
+Install-Module -Name PSAdvancedJsonCmdlet -Scope AllUsers
 ```
 
 ----
@@ -146,7 +153,7 @@ PowerShell DSC Resource to create JSON file.
     + CRLF (default) / LF
 
 + [bool] **UseLegacy** (Write):
-    + From `3.0.0`, This module uses Newtonsoft.Json based JSON serializer provided by [PSAdvancedJsonCmdlet]() instead of PowerShell built-in cmdlets.
+    + From `3.0.0`, This module uses Newtonsoft.Json based JSON serializer provided by [PSAdvancedJsonCmdlet](https://www.powershellgallery.com/packages/PSAdvancedJsonCmdlet) instead of PowerShell built-in cmdlets.
     + If `UseLegacy` specifies as `$true`, It will use built-in cmdlets.
     + Default value is `$false`.
 
@@ -292,6 +299,11 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 3.0.0
++ Changed JSON parser from PowerShell built-in cmdlets to [PSAdvancedJsonCmdlet](https://www.powershellgallery.com/packages/PSAdvancedJsonCmdlet) module.  
+  This change improves handling for non-compliant JSON format. (e.g., JSON with comments) and consistency of behavior between PS 7 and PS 5.1.
++ The minimum supported version of PowerShell changed from `5.0` to `5.1`.
+
 ### 2.4.2
 + Fixed an issue that line feeds may not be added correctly when an array of strings is input to `Set-NewContent` from the pipeline.
 
