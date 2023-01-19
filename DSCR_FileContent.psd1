@@ -5,7 +5,7 @@
     RequiredModules      = @('PSAdvancedJsonCmdlet')
 
     # Version number of this module.
-    ModuleVersion        = '3.0.0-beta.2'
+    ModuleVersion        = '3.0.0'
 
     # ID used to uniquely identify this module
     GUID                 = '8e9d0992-d96a-4489-8077-a04b1a560c4c'
@@ -54,6 +54,8 @@
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData          = @{
         PSData = @{
+            Prerelease = 'beta2'
+
             # Tags applied to this module. These help with module discovery in online galleries.
             Tags       = ('DesiredStateConfiguration', 'DSC', 'DSCResource', 'INI', 'TXT', 'JSON')
 
