@@ -1,22 +1,22 @@
-﻿
+﻿BeforeAll {
+    # Import TestHelper
+    $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+    Import-Module (Join-Path $script:moduleRoot '\DSCResources\JsonFile\JsonFile.psm1') -Force
+    Import-Module (Join-Path $PSScriptRoot '\TestHelper\TestHelper.psm1') -Force
+    $global:TestData = Join-Path $PSScriptRoot '\TestData'
+}
+
 # Begin Testing
-Describe 'Tests for JsonFile' {
+InModuleScope 'JsonFile' {
+    Describe 'Tests for JsonFile' {
 
-    BeforeAll {
-        # Import TestHelper
-        $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-        Import-Module (Join-Path $script:moduleRoot '\DSCResources\JsonFile\JsonFile.psm1') -Force
-        Import-Module (Join-Path $PSScriptRoot '\TestHelper\TestHelper.psm1') -Force
-        $global:TestData = Join-Path $PSScriptRoot '\TestData'
-    }
+        BeforeAll {
+            # Begin Testing
+            #region Set variables for testing
+            $ExistMock = 'Exist.Json'
+            $NonExistMock = 'NonExist.Json'
 
-    # Begin Testing
-    InModuleScope 'JsonFile' {
-        #region Set variables for testing
-        $ExistMock = 'Exist.Json'
-        $NonExistMock = 'NonExist.Json'
-
-        $MockJsonFile1 = @'
+            $MockJsonFile1 = @'
     {
         "String": "StringValue",
         "EmptyString": "",
@@ -48,6 +48,7 @@ Describe 'Tests for JsonFile' {
         }
     }
 '@
+        }
         #endregion Set variables for testing
 
         #region Tests for Get-TargetResource
