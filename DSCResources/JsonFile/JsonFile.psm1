@@ -63,10 +63,10 @@ function Get-TargetResource {
     $ValueObject = $null
     $tmp = try {
         if ($UseLegacy) {
-            ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+            ConvertFrom-Json -InputObject $Value -NoEnumerate -ErrorAction Ignore
         }
         else {
-            ConvertFrom-AdvancedJson -InputObject $Value -ErrorAction Ignore
+            ConvertFrom-AdvancedJson -InputObject $Value -NoEnumerate -ErrorAction Ignore
         }
     }
     catch { }
@@ -290,10 +290,10 @@ function Set-TargetResource {
     $ValueObject = $null
     $tmp = try {
         if ($UseLegacy) {
-            ConvertFrom-Json -InputObject $Value -ErrorAction Ignore
+            ConvertFrom-Json -InputObject $Value -NoEnumerate -ErrorAction Ignore
         }
         else {
-            ConvertFrom-AdvancedJson -InputObject $Value -ErrorAction Ignore
+            ConvertFrom-AdvancedJson -InputObject $Value -NoEnumerate -ErrorAction Ignore
         }
     }
     catch { }
@@ -320,10 +320,10 @@ function Set-TargetResource {
     if (Test-Path -Path $Path -PathType Leaf) {
         $JsonHash = try {
             if ($UseLegacy) {
-                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
+                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -NoEnumerate -ErrorAction Ignore
             }
             else {
-                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -ErrorAction Ignore
+                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -NoEnumerate -ErrorAction Ignore
             }
 
             if ($Json) {

@@ -21,6 +21,7 @@ BeforeAll {
 "Integer": 12345,
 "Boolean": true,
 "NULL": null,
+"SingleElementArray": ["SingleValue1"],
 "Array": [
  "ArrayValue1",
  "ArrayValue2",
@@ -178,6 +179,21 @@ Describe 'JsonFile_Get-TargetResource' {
                     ($null -eq $result.Value) | Should -BeTrue
         }
 
+        It 'Get exist Key Value Pair (Array with single elemnt)' {
+            $jsonPath = (Join-Path $TestDrive $ExistMock)
+            $getParam = @{
+                Path  = $jsonPath
+                Key   = 'SingleElementArray'
+                Value = (ConvertTo-Json @('SingleValue1'))
+            }
+
+            $result = Get-TargetResource @getParam
+            $result.Ensure | Should -Be 'Present'
+            $result.Path | Should -Be $getParam.Path
+            $result.Key | Should -Be $getParam.Key
+            $result.Value | Should -Be '["SingleValue1"]'
+        }
+
         It 'Get exist Key Value Pair (Array)' {
             $jsonPath = (Join-Path $TestDrive $ExistMock)
             $getParam = @{
@@ -293,6 +309,21 @@ Describe 'JsonFile_Get-TargetResource' {
             $result.Path | Should -Be $getParam.Path
             $result.Key | Should -Be $getParam.Key
             $result.Value | Should -Be '"StringValue"'
+        }
+
+        It 'Should return Absent when the key value was not matched (Single array should not treat as string)' {
+            $jsonPath = (Join-Path $TestDrive $ExistMock)
+            $getParam = @{
+                Path  = $jsonPath
+                Key   = 'SingleElementArray'
+                Value = '"SingleValue1"'
+            }
+
+            $result = Get-TargetResource @getParam
+            $result.Ensure | Should -Be 'Absent'
+            $result.Path | Should -Be $getParam.Path
+            $result.Key | Should -Be $getParam.Key
+            $result.Value | Should -Be '["SingleValue1"]'
         }
 
         It 'Should return Absent when the key value was not matched (SubDictionary)' {
@@ -719,6 +750,21 @@ Describe 'JsonFile_Set-TargetResource' {
             { Set-TargetResource @getParam } | Should -Not -Throw
             $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
                     ($null -eq $result.nullZ) | Should -BeTrue
+        }
+
+        It 'Add Key Value Pair to Json when the key not exist (Array with single element)' {
+            $jsonPath = (Join-Path $TestDrive $ExistMock)
+            $getParam = @{
+                Ensure = 'Present'
+                Path   = $jsonPath
+                Key    = 'SingleElementArrayZ'
+                Value  = '["str"]'
+            }
+
+            { Set-TargetResource @getParam } | Should -Not -Throw
+            $result = Get-Content -Path $jsonPath -Encoding utf8 -raw | ConvertFrom-Json
+            $result.SingleElementArrayZ.Length | Should -Be 1
+            $result.SingleElementArrayZ[0] | Should -Be "str"
         }
 
         It 'Add Key Value Pair to Json when the key not exist (Array)' {
