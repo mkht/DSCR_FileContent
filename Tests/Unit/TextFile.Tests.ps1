@@ -1,4 +1,6 @@
 ﻿
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.3.1"; MaximumVersion="5.99.99" }
+
 # Begin Testing
 Describe 'Tests for TextFile' {
 
@@ -11,17 +13,19 @@ Describe 'Tests for TextFile' {
     }
 
     InModuleScope 'TextFile' {
-        #region Set variables for testing
-        $ExistMock = 'Exist.txt'
-        $NonExistMock = 'NonExist.txt'
+        BeforeAll {
+            #region Set variables for testing
+            $ExistMock = 'Exist.txt'
+            $NonExistMock = 'NonExist.txt'
 
-        $MockContent = @'
+            $MockContent = @'
 {
   "test": "あいうえお"
 }
 
 '@
-        #endregion Set variables for testing
+            #endregion Set variables for testing
+        }
 
         #region Tests for Get-TargetResource
         Describe 'TextFile/Get-TargetResource' {

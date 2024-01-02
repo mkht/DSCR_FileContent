@@ -1,3 +1,5 @@
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.3.1"; MaximumVersion="5.99.99" }
+
 # Begin Testing
 Describe 'Tests for CommonHelper' {
 
@@ -10,11 +12,13 @@ Describe 'Tests for CommonHelper' {
     }
 
     InModuleScope 'CommonHelper' {
-        #region Set variables for testing
-        $SingleLineString = "Hello PowerShell!"
-        $MultiLineStringCRLF = "Hello PowerShell!`r`nThis is 2nd Line"
-        $MultiLineStringLF = "Hello PowerShell!`nThis is 2nd Line"
-        #endregion Set variables for testing
+        BeforeAll {
+            #region Set variables for testing
+            $SingleLineString = "Hello PowerShell!"
+            $MultiLineStringCRLF = "Hello PowerShell!`r`nThis is 2nd Line"
+            $MultiLineStringLF = "Hello PowerShell!`nThis is 2nd Line"
+            #endregion Set variables for testing
+        }
 
         #region Tests for Get-TargetResource
         Describe 'Convert-NewLine' {
@@ -69,9 +73,9 @@ Describe 'Tests for CommonHelper' {
                 }
 
                 It 'Values allowed for parameter NewLine are CRLF or LF' {
-                    {$null = Convert-NewLine -InputObject $SingleLineString -NewLine 'CRLF'} | Should -Not -Throw
-                    {$null = Convert-NewLine -InputObject $SingleLineString -NewLine 'LF'} | Should -Not -Throw
-                    {$null = Convert-NewLine -InputObject $SingleLineString -NewLine 'foo'} | Should -Throw
+                    { $null = Convert-NewLine -InputObject $SingleLineString -NewLine 'CRLF' } | Should -Not -Throw
+                    { $null = Convert-NewLine -InputObject $SingleLineString -NewLine 'LF' } | Should -Not -Throw
+                    { $null = Convert-NewLine -InputObject $SingleLineString -NewLine 'foo' } | Should -Throw
                 }
             }
         }

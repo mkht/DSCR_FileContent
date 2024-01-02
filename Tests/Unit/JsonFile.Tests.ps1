@@ -1,4 +1,4 @@
-﻿#Requires -Modules @{ ModuleName="Pester"; RequiredVersion="5.3.1" }
+﻿#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.3.1"; MaximumVersion="5.99.99" }
 #Requires -Modules PSAdvancedJsonCmdlet
 # $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 # Import-Module (Join-Path $script:moduleRoot '\DSCResources\JsonFile\JsonFile.psm1') -Force

@@ -1,21 +1,23 @@
 ﻿
 # Begin Testing
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.3.1"; MaximumVersion="5.99.99" }
+
+BeforeAll {
+    # Import TestHelper
+    $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+    Import-Module (Join-Path $script:moduleRoot '\DSCResources\IniFile\IniFile.psm1') -Force
+    Import-Module (Join-Path $PSScriptRoot '\TestHelper\TestHelper.psm1') -Force
+}
+
 Describe 'Tests for IniFile' {
 
-    BeforeAll {
-        # Import TestHelper
-        $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-        Import-Module (Join-Path $script:moduleRoot '\DSCResources\IniFile\IniFile.psm1') -Force
-        Import-Module (Join-Path $PSScriptRoot '\TestHelper\TestHelper.psm1') -Force
-    }
-
     InModuleScope 'IniFile' {
-        #region Set variables for testing
+        BeforeAll {
+            #region Set variables for testing
+            $ExistMock = 'Exist.ini'
+            $NonExistMock = 'NonExist.ini'
 
-        $ExistMock = 'Exist.ini'
-        $NonExistMock = 'NonExist.ini'
-
-        $MockIniFile1 = @"
+            $MockIniFile1 = @"
 Key1=Value1
 Key2=Value2
 Key3=
@@ -29,35 +31,36 @@ KeySA2=ValueSA2
 
 "@
 
-        $MockIniObject1 = [ordered]@{
-            _ROOT_   = [ordered]@{
-                Key1 = 'Value1'
-                Key2 = 'Value2'
-                Key3 = ''
+            $MockIniObject1 = [ordered]@{
+                _ROOT_   = [ordered]@{
+                    Key1 = 'Value1'
+                    Key2 = 'Value2'
+                    Key3 = ''
+                }
+
+                SectionA = [ordered]@{
+                    KeySA1 = 'ValueSA1'
+                    KeySA2 = 'ValueSA2'
+                }
+
+                SectionB = [ordered]@{ }
             }
 
-            SectionA = [ordered]@{
-                KeySA1 = 'ValueSA1'
-                KeySA2 = 'ValueSA2'
-            }
-
-            SectionB = [ordered]@{ }
+            #endregion Set variables for testing
         }
-
-        #endregion Set variables for testing
 
         #region Tests for Get-TargetResource
         Describe 'IniFile/Get-TargetResource' {
+            BeforeAll {
+                Mock Get-IniFile {
+                    return $MockIniObject1
+                }
 
-            Mock Get-IniFile {
-                return $MockIniObject1
+                Mock Test-Path { $true } -ParameterFilter { $Path -eq $ExistMock }
+                Mock Test-Path { $false } -ParameterFilter { $Path -eq $NonExistMock }
             }
 
-            Mock Test-Path { $true } -ParameterFilter { $Path -eq $ExistMock }
-            Mock Test-Path { $false } -ParameterFilter { $Path -eq $NonExistMock }
-
             Context 'Ensure = Present' {
-
 
                 It 'Get exist Key Value Pair, with ROOT section' {
                     $getParam = @{
@@ -184,16 +187,19 @@ KeySA2=ValueSA2
         #region Tests for Test-TargetResource
         Describe 'IniFile/Test-TargetResource' {
 
-            Mock Get-IniFile {
-                return $MockIniObject1
+            BeforeAll {
+                Mock Get-IniFile {
+                    return $MockIniObject1
+                }
+
+                Mock Test-Path { $true } -ParameterFilter { $Path -eq $ExistMock }
+                Mock Test-Path { $false } -ParameterFilter { $Path -eq $NonExistMock }
             }
 
-            Mock Test-Path { $true } -ParameterFilter { $Path -eq $ExistMock }
-            Mock Test-Path { $false } -ParameterFilter { $Path -eq $NonExistMock }
-
             Context 'Ensure = Present' {
-
-                Mock Test-Path { $true }
+                BeforeAll {
+                    Mock Test-Path { $true }
+                }
 
                 It 'Should return $true when the key value pair exist (with ROOT section)' {
                     $getParam = @{
@@ -443,21 +449,22 @@ KeySA2=ValueSA2
 
         #region Tests for Set-TargetResource
         Describe 'IniFile/Set-TargetResource' {
+            BeforeAll {
+                Mock Get-IniFile {
+                    [ordered]@{
+                        _ROOT_   = [ordered]@{
+                            Key1 = 'Value1'
+                            Key2 = 'Value2'
+                            Key3 = ''
+                        }
 
-            Mock Get-IniFile {
-                [ordered]@{
-                    _ROOT_   = [ordered]@{
-                        Key1 = 'Value1'
-                        Key2 = 'Value2'
-                        Key3 = ''
+                        SectionA = [ordered]@{
+                            KeySA1 = 'ValueSA1'
+                            KeySA2 = 'ValueSA2'
+                        }
+
+                        SectionB = [ordered]@{ }
                     }
-
-                    SectionA = [ordered]@{
-                        KeySA1 = 'ValueSA1'
-                        KeySA2 = 'ValueSA2'
-                    }
-
-                    SectionB = [ordered]@{ }
                 }
             }
 
