@@ -298,6 +298,9 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 3.0.1
++ [JsonFile] Fixed an issue that the arrays with a single element mistakenly treated as a single value.
+
 ### 3.0.0
 + Changed JSON parser from PowerShell built-in cmdlets to [PSAdvancedJsonCmdlet](https://www.powershellgallery.com/packages/PSAdvancedJsonCmdlet) module.  
   This change improves handling for non-compliant JSON format. (e.g., JSON with comments) and consistency of behavior between PS 7 and PS 5.1.
