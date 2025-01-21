@@ -66,7 +66,7 @@ function Get-TargetResource {
             ConvertFrom-Json -InputObject $Value -NoEnumerate -ErrorAction Ignore
         }
         else {
-            ConvertFrom-AdvancedJson -InputObject $Value -NoEnumerate -ErrorAction Ignore
+            ConvertFrom-AdvancedJson -InputObject $Value -NoEnumerate -AsHashtable -Depth 100 -ErrorAction Ignore
         }
     }
     catch { }
@@ -101,7 +101,7 @@ function Get-TargetResource {
                 Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -ErrorAction Ignore
             }
             else {
-                Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -ErrorAction Ignore
+                Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -AsHashtable -Depth 100 -ErrorAction Ignore
             }
         }
         catch { }
@@ -135,10 +135,10 @@ function Get-TargetResource {
                     }
                     else {
                         if ($UseLegacy) {
-                            $Result.Value = ConvertTo-Json -InputObject $tHash.$tKey -Compress
+                            $Result.Value = ConvertTo-Json -InputObject $tHash.$tKey -Depth 100 -Compress
                         }
                         else {
-                            $Result.Value = ConvertTo-AdvancedJson -InputObject $tHash.$tKey -Compress
+                            $Result.Value = ConvertTo-AdvancedJson -InputObject $tHash.$tKey -Depth 100 -Compress
                         }
                     }
 
@@ -323,7 +323,7 @@ function Set-TargetResource {
                 $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-Json -NoEnumerate -ErrorAction Ignore
             }
             else {
-                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -NoEnumerate -ErrorAction Ignore
+                $Json = Get-NewContent -Path $Path -Raw -Encoding $Encoding | ConvertFrom-AdvancedJson -NoEnumerate -Depth 100 -ErrorAction Ignore
             }
 
             if ($Json) {

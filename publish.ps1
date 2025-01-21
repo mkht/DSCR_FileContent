@@ -1,15 +1,17 @@
+#Requires -Modules Microsoft.PowerShell.PSResourceGet
+
 Param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
     [string]$NugetApiKey,
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string[]]$ExcludeDirs = @('.git', '.vscode', 'Tests'),
+    [string[]]$ExcludeDirs = @('.git', '.github', '.vscode', 'Tests', 'Examples'),
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string[]]$ExcludeFiles = @('.gitignore', 'appveyor.yml', 'codecov.yml'),
+    [string[]]$ExcludeFiles = @('.gitignore', '.gitmodules', '.gitattributes'),
 
     [switch]$WhatIf
 )
@@ -35,7 +37,7 @@ try {
     robocopy $ModuleDir $Destination /MIR /XD $ExcludeDirs /XF $ExcludeFiles /NP > $null
 
     Set-Location $Destination
-    Publish-Module -Path ./ -NuGetApiKey $NugetApiKey -Verbose -WhatIf:$WhatIf
+    Publish-PSResource -Path ./ -Repository PSGallery -ApiKey $NugetApiKey -Verbose -WhatIf:$WhatIf
 }
 finally {
     Set-Location $ModuleDir
