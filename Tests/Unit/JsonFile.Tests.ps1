@@ -16,35 +16,47 @@ BeforeAll {
 
     $MockJsonFile1 = @'
 {
-"String": "StringValue",
-"EmptyString": "",
-"Integer": 12345,
-"Boolean": true,
-"NULL": null,
-"SingleElementArray": ["SingleValue1"],
-"Array": [
- "ArrayValue1",
- "ArrayValue2",
- "ArrayValue3"
-],
-"Dictionary": {
- "DicKey1": "DicValue1",
- "DicKey2": "DicValue2"
-},
-"SubDictionary": {
- "SubDicKey1": {
-     "SubSubKey1": "SubSubValue1",
-     "SubSubKey2": "SubSubValue2"
- },
- "SubDicKey2": true
-},
-"Escape/Dictionary": {
- "Sub\\/\\/Esc/Key\\1": {
-     "Sub/Sub\\Key1": "SubSubValue1",
-     "Sub//SubKey2": "SubSubValue2"
- },
- "Sub/EscKey2": true
-}
+    "String": "StringValue",
+    "EmptyString": "",
+    "Integer": 12345,
+    "Boolean": true,
+    "NULL": null,
+    "SingleElementArray": [
+        "SingleValue1"
+    ],
+    "Array": [
+        "ArrayValue1",
+        "ArrayValue2",
+        "ArrayValue3"
+    ],
+    "Dictionary": {
+        "DicKey1": "DicValue1",
+        "DicKey2": "DicValue2"
+    },
+    "SubDictionary": {
+        "SubDicKey1": {
+            "SubSubKey1": "SubSubValue1",
+            "SubSubKey2": "SubSubValue2"
+        },
+        "SubDicKey2": true
+    },
+    "Escape/Dictionary": {
+        "Sub\\/\\/Esc/Key\\1": {
+            "Sub/Sub\\Key1": "SubSubValue1",
+            "Sub//SubKey2": "SubSubValue2"
+        },
+        "Sub/EscKey2": true
+    },
+    "DictionariesInArray": [
+        {
+            "DiA1": {
+                "Key11": "Value11"
+            }
+        },
+        {
+            "DiA2": "Value21"
+        }
+    ]
 }
 '@
 }
@@ -269,6 +281,21 @@ Describe 'JsonFile_Get-TargetResource' {
             $result.Key | Should -Be $getParam.Key
             $result.Value | Should -Be '["ArrayValue1","ArrayValue2","ArrayValue3"]'
         }
+
+        It 'Get exist Key Value Pair (Dictionaries in array)' {
+            $jsonPath = (Join-Path $TestDrive $ExistMock)
+            $getParam = @{
+                Path  = $jsonPath
+                Key   = 'DictionariesInArray'
+                Value = (@(@{DiA1 = @{Key11 = "Value11" }; DiA2 = "Value21" }) | ConvertTo-Json -Depth 10)
+            }
+
+            $result = Get-TargetResource @getParam
+            $result.Ensure | Should -Be 'Present'
+            $result.Path | Should -Be $getParam.Path
+            $result.Key | Should -Be $getParam.Key
+            $result.Value | Should -Be '{"DiA1":{"Key11":"Value11"},"DiA2":"Value21"}'
+        }
     }
 
     Context 'Ensure = Absent' {
@@ -362,6 +389,18 @@ Describe 'JsonFile_Get-TargetResource' {
                 Path  = $jsonPath
                 Key   = 'Boolean/SubDicKey2'
                 Value = 'true'
+            }
+
+            $result = Get-TargetResource @getParam
+            $result.Ensure | Should -Be 'Absent'
+        }
+
+        It 'Get exist Key Value Pair (Dictionaries in array)' {
+            $jsonPath = (Join-Path $TestDrive $ExistMock)
+            $getParam = @{
+                Path  = $jsonPath
+                Key   = 'DictionariesInArray'
+                Value = (@(@{DiA1 = @{Key11 = "Value11" }; DiA2 = "not match" }) | ConvertTo-Json -Depth 10)
             }
 
             $result = Get-TargetResource @getParam
