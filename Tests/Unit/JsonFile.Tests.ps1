@@ -287,14 +287,14 @@ Describe 'JsonFile_Get-TargetResource' {
             $getParam = @{
                 Path  = $jsonPath
                 Key   = 'DictionariesInArray'
-                Value = (@(@{DiA1 = @{Key11 = "Value11" }; DiA2 = "Value21" }) | ConvertTo-Json -Depth 10)
+                Value = (ConvertTo-Json @(@{DiA1 = @{Key11 = "Value11" }}, @{DiA2 = "Value21" }) -Depth 10)
             }
 
             $result = Get-TargetResource @getParam
             $result.Ensure | Should -Be 'Present'
             $result.Path | Should -Be $getParam.Path
             $result.Key | Should -Be $getParam.Key
-            $result.Value | Should -Be '{"DiA1":{"Key11":"Value11"},"DiA2":"Value21"}'
+            $result.Value | Should -Be '[{"DiA1":{"Key11":"Value11"}},{"DiA2":"Value21"}]'
         }
     }
 
@@ -400,7 +400,7 @@ Describe 'JsonFile_Get-TargetResource' {
             $getParam = @{
                 Path  = $jsonPath
                 Key   = 'DictionariesInArray'
-                Value = (@(@{DiA1 = @{Key11 = "Value11" }; DiA2 = "not match" }) | ConvertTo-Json -Depth 10)
+                Value = (ConvertTo-Json @(@{DiA1 = @{Key11 = "Value11" }}, @{DiA2 = "not match" }) -Depth 10)
             }
 
             $result = Get-TargetResource @getParam
