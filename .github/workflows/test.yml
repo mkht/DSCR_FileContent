@@ -1,0 +1,42 @@
+# Run tests on every push to the repository
+
+on: [push]
+
+jobs:
+  Tests_PowerShell_5:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Requried Modules
+        run: Install-Module PSAdvancedJsonCmdlet -Repository PSGallery -Force -AllowClobber
+
+      - name: Run Tests
+        run: |
+          $pesterConf = New-PesterConfiguration
+          $pesterConf.Output.Verbosity = 'Detailed'
+          $pesterConf.Output.CIFormat = 'GithubActions'
+          Invoke-pester -Configuration $pesterConf
+
+  Tests_PowerShell_7:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Requried Modules
+        run: Install-Module PSAdvancedJsonCmdlet -Repository PSGallery -Force -AllowClobber
+
+      - name: Run Tests
+        run: |
+          $pesterConf = New-PesterConfiguration
+          $pesterConf.Output.Verbosity = 'Detailed'
+          $pesterConf.Output.CIFormat = 'GithubActions'
+          Invoke-pester -Configuration $pesterConf
