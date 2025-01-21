@@ -298,6 +298,11 @@ Key1=Value1
 
 ----
 ## ChangeLog
+### 3.0.2
++ [JsonFile] Fixed an issue where JSON containing dictionaries within array elements was not correctly parsed.
++ Revised the structure of the test code
++ Added automated test execution using GitHub Actions Workflow
+
 ### 3.0.1
 + [JsonFile] Fixed an issue that the arrays with a single element mistakenly treated as a single value.
 
